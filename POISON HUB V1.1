@@ -16,8 +16,58 @@ local success, errorMsg = pcall(function()
     local Lighting = game:GetService("Lighting")
     local TextService = game:GetService("TextService")
     local StarterGui = game:GetService("StarterGui")
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
     print("Services initialized successfully")
+
+    -- Function to send "POISON ON TOP" message once
+    local function sendPoisonMessage()
+        print("Attempting to send POISON ON TOP message...")
+        local messageSent = false
+        
+        -- Method 1: DefaultChatSystemChatEvents (most common legacy chat)
+        if not messageSent then
+            pcall(function()
+                local DefaultChatSystemChatEvents = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
+                if DefaultChatSystemChatEvents then
+                    local SayMessageRequest = DefaultChatSystemChatEvents:FindFirstChild("SayMessageRequest")
+                    if SayMessageRequest and SayMessageRequest:IsA("RemoteEvent") then
+                        SayMessageRequest:FireServer("POISON ON TOP", "All")
+                        messageSent = true
+                        print("Message sent via DefaultChatSystemChatEvents")
+                    end
+                end
+            end)
+        end
+        
+        -- Method 2: Legacy Players:Chat
+        if not messageSent then
+            pcall(function()
+                Players:Chat("POISON ON TOP")
+                messageSent = true
+                print("Message sent via Players:Chat")
+            end)
+        end
+        
+        -- Method 3: TextChatService (newest chat system)
+        if not messageSent then
+            pcall(function()
+                local TextChatService = game:GetService("TextChatService")
+                if TextChatService then
+                    local textChannel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+                    if textChannel then
+                        textChannel:SendAsync("POISON ON TOP")
+                        messageSent = true
+                        print("Message sent via TextChatService")
+                    end
+                end
+            end)
+        end
+        
+        if not messageSent then
+            print("Could not send POISON ON TOP message through any method")
+        end
+    end
 
     -- Create a notification to show the script is working
     local function showNotification(title, text, duration)
@@ -33,6 +83,9 @@ local success, errorMsg = pcall(function()
     -- Show a notification that the script is starting
     showNotification("Poison Hub", "Script is starting...", 3)
     print("Initial notification shown")
+
+    -- Send POISON ON TOP message once at the start
+    sendPoisonMessage()
 
     -- Safely load BigBaseplate with error handling
     local function safelyLoadBigBaseplate()
@@ -627,17 +680,17 @@ local success, errorMsg = pcall(function()
         imgCorner.Parent = imageLabel
 
         local textLabel = Instance.new("TextLabel")
-textLabel.Name = "NotificationText"
-textLabel.Size = UDim2.new(1, -70, 1, 0)
-textLabel.Position = UDim2.new(0, 60, 0, 0)
-textLabel.BackgroundTransparency = 1
-textLabel.Text = notifMessage
-textLabel.Font = Enum.Font.GothamBold
-textLabel.TextSize = 16
-textLabel.TextColor3 = Color3.new(1, 1, 1)
-textLabel.TextWrapped = true
-textLabel.TextXAlignment = Enum.TextXAlignment.Center
-textLabel.Parent = frame
+        textLabel.Name = "NotificationText"
+        textLabel.Size = UDim2.new(1, -70, 1, 0)
+        textLabel.Position = UDim2.new(0, 60, 0, 0)
+        textLabel.BackgroundTransparency = 1
+        textLabel.Text = notifMessage
+        textLabel.Font = Enum.Font.GothamBold
+        textLabel.TextSize = 16
+        textLabel.TextColor3 = Color3.new(1, 1, 1)
+        textLabel.TextWrapped = true
+        textLabel.TextXAlignment = Enum.TextXAlignment.Center
+        textLabel.Parent = frame
 
         -- Tweens
         local tweenIn = TweenService:Create(frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
@@ -781,6 +834,8 @@ textLabel.Parent = frame
         -- Only show notification for the local player (already fixed in the function)
         if player == Players.LocalPlayer then
             showPoisonHubNotification(player)
+            -- Send POISON ON TOP message when local player joins
+            sendPoisonMessage()
         end
     end)
 
