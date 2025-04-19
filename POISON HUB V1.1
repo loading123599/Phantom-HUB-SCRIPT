@@ -1610,6 +1610,17 @@ textLabel.Parent = frame
 
        local Tab = Window:CreateTab("ReAnimation", "user")
        local Divider = Tab:CreateDivider()
+       local Button = Tab:CreateButton({
+    Name = "Load Reanimation",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/loading123599/Poisons-Hub-V1.1/main/Reanimation.lua"))()
+        Rayfield:Notify({
+            Title = "Reanimation",
+            Content = "Reanimation script loaded successfully!",
+            Duration = 3,
+        })
+    end,
+})
 
        local Tab = Window:CreateTab("Copy Animation", "pen")
        local Divider = Tab:CreateDivider()
