@@ -17,9 +17,72 @@ local success, errorMsg = pcall(function()
     local TextService = game:GetService("TextService")
     local StarterGui = game:GetService("StarterGui")
     local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local TextChatService = game:GetService("TextChatService")
 
     print("Services initialized successfully")
 
+    -- Create a table to track known Poison Hub users
+    local PoisonHubUsers = {}
+    -- Add the local player to the known users
+    PoisonHubUsers[Players.LocalPlayer.Name] = true
+
+    -- Function to send "POISON HUB ON TOP!" message once
+    local function sendPoisonMessage()
+        print("Sending POISON HUB ON TOP message...")
+        
+        local function sendMessage(content)
+            local chatChannel = TextChatService:FindFirstChild("TextChannels") and TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+            if chatChannel then
+                chatChannel:SendAsync(content)
+                print("Message sent via TextChatService")
+            else
+                -- Fallback to legacy chat if TextChatService isn't available
+                pcall(function()
+                    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(content, "All")
+                    print("Message sent via legacy chat")
+                end)
+            end
+        end
+        
+        sendMessage("POISON HUB ON TOP!")
+    end
+
+    -- Listen for messages from other players to detect Poison Hub users
+    -- Try to use TextChatService first
+    pcall(function()
+        if TextChatService then
+            TextChatService.MessageReceived:Connect(function(message)
+                if message.Text == "POISON HUB ON TOP!" and message.TextSource then
+                    local senderUserId = message.TextSource.UserId
+                    local sender = Players:GetPlayerByUserId(senderUserId)
+                    if sender and sender ~= Players.LocalPlayer then
+                        print("Detected Poison Hub user via TextChatService: " .. sender.Name)
+                        PoisonHubUsers[sender.Name] = true
+                        -- Apply tag to the newly identified user
+                        applyPlayerTag(sender)
+                    end
+                end
+            end)
+        end
+    end)
+
+    -- Fallback to legacy chat detection
+    pcall(function()
+        local chatEvents = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
+        if chatEvents and chatEvents:FindFirstChild("OnMessageDoneFiltering") then
+            chatEvents.OnMessageDoneFiltering.OnClientEvent:Connect(function(messageData)
+                if messageData.Message == "POISON HUB ON TOP!" then
+                    local sender = Players:FindFirstChild(messageData.FromSpeaker)
+                    if sender and sender ~= Players.LocalPlayer then
+                        print("Detected Poison Hub user via legacy chat: " .. sender.Name)
+                        PoisonHubUsers[sender.Name] = true
+                        -- Apply tag to the newly identified user
+                        applyPlayerTag(sender)
+                    end
+                end
+            end)
+        end
+    end)
 
     -- Create a notification to show the script is working
     local function showNotification(title, text, duration)
@@ -678,7 +741,7 @@ local success, errorMsg = pcall(function()
         end)
     end
 
-    -- Player tag application logic - FIX: Only apply tags to specific players
+    -- Player tag application logic - MODIFIED to include other Poison Hub users
     local function applyPlayerTag(player)
         if not player or not player:IsDescendantOf(Players) then
             return
@@ -689,8 +752,8 @@ local success, errorMsg = pcall(function()
         -- Check if player is a founder/owner
         if FounderTags[player.Name] then
             assignedTag = FounderTags[player.Name]
-        elseif player == Players.LocalPlayer then
-            -- Only give the local player (script executor) a tag
+        elseif PoisonHubUsers[player.Name] then
+            -- Any known Poison Hub user gets a tag
             assignedTag = "Poison User"
         end
 
@@ -727,15 +790,15 @@ local success, errorMsg = pcall(function()
 
     local localPlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
 
-    -- Tag Refresh/Cleanup Coroutine - FIX: Only check for tags on whitelisted players
+    -- Tag Refresh/Cleanup Coroutine - MODIFIED to include other Poison Hub users
     spawn(function()
         while task.wait(2) do
             local validAdornees = {}
             local currentPlayers = Players:GetPlayers()
 
             for _, player in ipairs(currentPlayers) do
-                -- Only check players who should have tags
-                local shouldHaveTag = FounderTags[player.Name] or player == Players.LocalPlayer
+                -- Check players who should have tags (founders or known Poison Hub users)
+                local shouldHaveTag = FounderTags[player.Name] or PoisonHubUsers[player.Name]
 
                 if shouldHaveTag and player.Character and player.Character:FindFirstChild("Head") then
                     table.insert(validAdornees, player.Character.Head)
@@ -767,27 +830,25 @@ local success, errorMsg = pcall(function()
         end
     end)
 
-    -- Initial setup for existing players - FIX: Only apply tags to specific players
+    -- Initial setup for existing players - MODIFIED to include other Poison Hub users
     for _, player in ipairs(Players:GetPlayers()) do
         if FounderTags[player.Name] or player == Players.LocalPlayer then
             task.spawn(applyPlayerTag, player)
         end
     end
 
-    -- Handle players joining - FIX: Only apply tags to specific players and only show notification for local player
+    -- Handle players joining - MODIFIED to include other Poison Hub users
     Players.PlayerAdded:Connect(function(player)
         task.wait(0.5)
 
-        -- Only apply tag if player is in whitelist or is the local player
-        if FounderTags[player.Name] or player == Players.LocalPlayer then
+        -- Apply tag if player is in whitelist or is the local player
+        if FounderTags[player.Name] or PoisonHubUsers[player.Name] then
             task.spawn(applyPlayerTag, player)
         end
 
         -- Only show notification for the local player (already fixed in the function)
         if player == Players.LocalPlayer then
             showPoisonHubNotification(player)
-            -- Send POISON ON TOP message when local player joins
-            sendPoisonMessage()
         end
     end)
 
@@ -803,6 +864,9 @@ local success, errorMsg = pcall(function()
                 end
             end
         end
+        
+        -- Remove from PoisonHubUsers table
+        PoisonHubUsers[player.Name] = nil
     end)
 
     -- Create tag system API for the UI to use
@@ -1448,7 +1512,7 @@ local success, errorMsg = pcall(function()
        local InfoTab = Window:CreateTab("Info", "info")
        local Paragraph = InfoTab:CreateParagraph({
            Title = "Important Information",
-           Content = "Player tags are only visible to you. Other players who execute this script will see their own version of the tags. This is a client-side feature.\n\nAll credits go to AK ADMIN, join their server: discord.gg/akadmin"
+           Content = "Player tags are visible to all Poison Hub users. When someone sends the 'POISON HUB ON TOP!' message, they are identified as a Poison Hub user and will be given a tag visible to other users.\n\nAll credits go to AK ADMIN, join their server: discord.gg/akadmin"
        })
 
        local Divider = Tab:CreateDivider()
