@@ -19,16 +19,7 @@ local success, errorMsg = pcall(function()
     local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
     print("Services initialized successfully")
-local TextChatService = game:GetService("TextChatService")
-local function sendMessage(content)
-    local chatChannel = TextChatService:FindFirstChild("TextChannels") and TextChatService.TextChannels:FindFirstChild("RBXGeneral")
-    if chatChannel then
-        chatChannel:SendAsync(content)
-    else
-        warn("RBXGeneral not found!")
-    end
-end
-    sendMessage("POISON HUB ON TOP!")
+
 
     -- Create a notification to show the script is working
     local function showNotification(title, text, duration)
