@@ -19,55 +19,16 @@ local success, errorMsg = pcall(function()
     local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
     print("Services initialized successfully")
-
-    -- Function to send "POISON ON TOP" message once
-    local function sendPoisonMessage()
-        print("Attempting to send POISON ON TOP message...")
-        local messageSent = false
-        
-        -- Method 1: DefaultChatSystemChatEvents (most common legacy chat)
-        if not messageSent then
-            pcall(function()
-                local DefaultChatSystemChatEvents = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
-                if DefaultChatSystemChatEvents then
-                    local SayMessageRequest = DefaultChatSystemChatEvents:FindFirstChild("SayMessageRequest")
-                    if SayMessageRequest and SayMessageRequest:IsA("RemoteEvent") then
-                        SayMessageRequest:FireServer("POISON ON TOP", "All")
-                        messageSent = true
-                        print("Message sent via DefaultChatSystemChatEvents")
-                    end
-                end
-            end)
-        end
-        
-        -- Method 2: Legacy Players:Chat
-        if not messageSent then
-            pcall(function()
-                Players:Chat("POISON ON TOP")
-                messageSent = true
-                print("Message sent via Players:Chat")
-            end)
-        end
-        
-        -- Method 3: TextChatService (newest chat system)
-        if not messageSent then
-            pcall(function()
-                local TextChatService = game:GetService("TextChatService")
-                if TextChatService then
-                    local textChannel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
-                    if textChannel then
-                        textChannel:SendAsync("POISON ON TOP")
-                        messageSent = true
-                        print("Message sent via TextChatService")
-                    end
-                end
-            end)
-        end
-        
-        if not messageSent then
-            print("Could not send POISON ON TOP message through any method")
-        end
+local TextChatService = game:GetService("TextChatService")
+local function sendMessage(content)
+    local chatChannel = TextChatService:FindFirstChild("TextChannels") and TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+    if chatChannel then
+        chatChannel:SendAsync(content)
+    else
+        warn("RBXGeneral not found!")
     end
+end
+    sendMessage("POISON HUB ON TOP!")
 
     -- Create a notification to show the script is working
     local function showNotification(title, text, duration)
