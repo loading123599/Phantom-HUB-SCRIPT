@@ -16,7 +16,7 @@ local success, errorMsg = pcall(function()
     local Lighting = game:GetService("Lighting")
     local TextService = game:GetService("TextService")
     local StarterGui = game:GetService("StarterGui")
-    
+
     print("Services initialized successfully")
 
     -- Create a notification to show the script is working
@@ -40,22 +40,22 @@ local success, errorMsg = pcall(function()
         local success, result = pcall(function()
             return game:HttpGet("https://raw.githubusercontent.com/loading123599/Poisons-Hub-V1.1/refs/heads/main/BigBaseplate.lua")
         end)
-        
+
         if not success then
             warn("Failed to fetch BigBaseplate: " .. tostring(result))
             return false
         end
-        
+
         print("BigBaseplate fetched, attempting to execute...")
         local loadSuccess, loadError = pcall(function()
             loadstring(result)()
         end)
-        
+
         if not loadSuccess then
             warn("Failed to execute BigBaseplate: " .. tostring(loadError))
             return false
         end
-        
+
         print("BigBaseplate loaded successfully!")
         return true
     end
@@ -77,19 +77,19 @@ local success, errorMsg = pcall(function()
         screenGui.Name = "CreditsGui"
         screenGui.ResetOnSpawn = false
         screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-        
+
         if RunService:IsStudio() then
             screenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
         else
             pcall(function()
                 screenGui.Parent = game.CoreGui
             end)
-            
+
             if not screenGui.Parent then
                 screenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
             end
         end
-        
+
         local frame = Instance.new("Frame")
         frame.Name = "CreditsFrame"
         frame.Size = UDim2.new(0, 350, 0, 100)
@@ -98,16 +98,16 @@ local success, errorMsg = pcall(function()
         frame.BackgroundTransparency = 0.2
         frame.BorderSizePixel = 0
         frame.Parent = screenGui
-        
+
         local corner = Instance.new("UICorner")
         corner.CornerRadius = UDim.new(0, 10)
         corner.Parent = frame
-        
+
         local stroke = Instance.new("UIStroke")
         stroke.Color = Color3.fromRGB(138, 43, 226) -- Purple
         stroke.Thickness = 2
         stroke.Parent = frame
-        
+
         local title = Instance.new("TextLabel")
         title.Name = "Title"
         title.Size = UDim2.new(1, 0, 0, 30)
@@ -118,7 +118,7 @@ local success, errorMsg = pcall(function()
         title.TextSize = 18
         title.Text = "Credits"
         title.Parent = frame
-        
+
         local message = Instance.new("TextLabel")
         message.Name = "Message"
         message.Size = UDim2.new(1, -20, 0, 60)
@@ -130,12 +130,12 @@ local success, errorMsg = pcall(function()
         message.TextWrapped = true
         message.Text = "All credits go to AK ADMIN, join their server\ndiscord.gg/akadmin"
         message.Parent = frame
-        
+
         -- Slide in animation
         local tweenIn = TweenService:Create(frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), 
             {Position = UDim2.new(0.5, -175, 0, 20)})
         tweenIn:Play()
-        
+
         -- Wait 10 seconds then slide out
         spawn(function()
             wait(10)
@@ -154,7 +154,7 @@ local success, errorMsg = pcall(function()
 
     -- Rest of your script...
     -- (Include the rest of the script here)
-    
+
     -- Checks if a value exists in a table (case-insensitive)
     local function containsIgnoreCase(tbl, name)
         if not tbl or not name then return false end
@@ -185,8 +185,9 @@ local success, errorMsg = pcall(function()
     -- Define founders/owners with their custom tags (keeping original Poison Hub names and roles)
     local FounderTags = {
        ["GoodHelper12345"] = "Poison VIP",
-       ["Alex"] = "1can3uss", "Micupaltaxc"
-       ["auralinker"] = "Poison Admin", ""
+       ["1can3uss"] = "Alex",
+       ["MicupAltAxc"] = "Alex",
+       ["auralinker"] = "Poison Admin",
        ["YournothimbuddyXD"] = "AK Owner",
         ["Skyler_Saint"] = "Poison<3"
     }
@@ -345,13 +346,13 @@ local success, errorMsg = pcall(function()
             head = character:WaitForChild("Head", 1)
             if not head then return end
         end
-        
+
         -- Disable default Roblox nametag
         local humanoid = character:FindFirstChildOfClass("Humanoid")
         if humanoid then
             humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
         end
-        
+
         -- Remove any existing custom tag for this head
         for _, child in ipairs(head:GetChildren()) do
             if child.Name == "PoisonTag" then
@@ -538,7 +539,7 @@ local success, errorMsg = pcall(function()
                 activeTween = false
             end
         end)
-        
+
         Players.PlayerRemoving:Connect(function(removedPlayer)
             if removedPlayer == player then
                 if tag and tag.Parent then
@@ -557,7 +558,7 @@ local success, errorMsg = pcall(function()
                 teleportToPlayer(player)
             end)
         end
-        
+
         return tag
     end
 
@@ -567,10 +568,10 @@ local success, errorMsg = pcall(function()
     local function showPoisonHubNotification(player)
         -- Only show notification for the local player (script executor)
         if player ~= Players.LocalPlayer then return end
-        
+
         local playerName = player.Name
         local notifMessage = "You have executed Poison Hub"
-        
+
         -- FIX: Add check for player UserId
         local thumb = ""
         if player and player.UserId then
@@ -585,7 +586,7 @@ local success, errorMsg = pcall(function()
         local screenGui = Instance.new("ScreenGui")
         screenGui.Name = "PoisonHubNotificationGui"
         screenGui.ResetOnSpawn = false
-        
+
         -- Use pcall to handle potential errors when parenting to CoreGui
         pcall(function()
             screenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -623,17 +624,17 @@ local success, errorMsg = pcall(function()
         imgCorner.Parent = imageLabel
 
         local textLabel = Instance.new("TextLabel")
-        textLabel.Name = "NotificationText"
-        textLabel.Size = UDim2.new(1, -70, 1, 0)
-        textLabel.Position = UDim2.new(0, 60, 0, 0)
-        textLabel.BackgroundTransparency = 1
-        textLabel.Text = notifMessage
-        textLabel.Font = Enum.Font.GothamBold
-        textLabel.TextSize = 16
-        textLabel.TextColor3 = Color3.new(1, 1, 1)
-        textLabel.TextWrapped = true
-        textLabel.TextXAlignment = Enum.TextXAlignment.Center
-        textLabel.Parent = frame
+textLabel.Name = "NotificationText"
+textLabel.Size = UDim2.new(1, -70, 1, 0)
+textLabel.Position = UDim2.new(0, 60, 0, 0)
+textLabel.BackgroundTransparency = 1
+textLabel.Text = notifMessage
+textLabel.Font = Enum.Font.GothamBold
+textLabel.TextSize = 16
+textLabel.TextColor3 = Color3.new(1, 1, 1)
+textLabel.TextWrapped = true
+textLabel.TextXAlignment = Enum.TextXAlignment.Center
+textLabel.Parent = frame
 
         -- Tweens
         local tweenIn = TweenService:Create(frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
@@ -655,12 +656,12 @@ local success, errorMsg = pcall(function()
         if player.Character then
             attachTagToHead(player.Character, player, rankText)
         end
-        
+
         local charAddedConn = player.CharacterAdded:Connect(function(character)
             task.wait()
             attachTagToHead(character, player, rankText)
         end)
-        
+
         local playerRemovingConn = Players.PlayerRemoving:Connect(function(leavingPlayer)
             if leavingPlayer == player then
                 if charAddedConn then charAddedConn:Disconnect() end
@@ -674,9 +675,9 @@ local success, errorMsg = pcall(function()
         if not player or not player:IsDescendantOf(Players) then
             return
         end
-        
+
         local assignedTag = nil
-        
+
         -- Check if player is a founder/owner
         if FounderTags[player.Name] then
             assignedTag = FounderTags[player.Name]
@@ -693,7 +694,7 @@ local success, errorMsg = pcall(function()
                     child:Destroy()
                 end
             end
-            
+
             local localPlayerGui = Players.LocalPlayer:FindFirstChild("PlayerGui")
             if localPlayerGui then
                 for _, gui in ipairs(localPlayerGui:GetChildren()) do
@@ -727,11 +728,11 @@ local success, errorMsg = pcall(function()
             for _, player in ipairs(currentPlayers) do
                 -- Only check players who should have tags
                 local shouldHaveTag = FounderTags[player.Name] or player == Players.LocalPlayer
-                
+
                 if shouldHaveTag and player.Character and player.Character:FindFirstChild("Head") then
                     table.insert(validAdornees, player.Character.Head)
                     local hasTag = false
-                    
+
                     for _, gui in ipairs(localPlayerGui:GetChildren()) do
                         if gui:IsA("BillboardGui") and gui.Name == "PoisonTag" and gui.Adornee == player.Character.Head then
                             hasTag = true
@@ -768,12 +769,12 @@ local success, errorMsg = pcall(function()
     -- Handle players joining - FIX: Only apply tags to specific players and only show notification for local player
     Players.PlayerAdded:Connect(function(player)
         task.wait(0.5)
-        
+
         -- Only apply tag if player is in whitelist or is the local player
         if FounderTags[player.Name] or player == Players.LocalPlayer then
             task.spawn(applyPlayerTag, player)
         end
-        
+
         -- Only show notification for the local player (already fixed in the function)
         if player == Players.LocalPlayer then
             showPoisonHubNotification(player)
@@ -802,10 +803,10 @@ local success, errorMsg = pcall(function()
                 warn("forceTag: Invalid player provided.")
                 return false
             end
-            
+
             if RankData[rankType] then
                 print(string.format("Forcing tag '%s' for player %s", rankType, player.Name))
-                
+
                 -- Remove existing tag
                 if player.Character and player.Character:FindFirstChild("Head") then
                     local head = player.Character.Head
@@ -815,14 +816,14 @@ local success, errorMsg = pcall(function()
                         end
                     end
                 end
-                
+
                 -- Also remove from LocalPlayerGui
                 for _, gui in ipairs(localPlayerGui:GetChildren()) do
                     if gui:IsA("BillboardGui") and gui.Name == "PoisonTag" and gui.Adornee and gui.Adornee.Parent == player.Character then
                         gui:Destroy()
                     end
                 end
-                
+
                 -- Create tag
                 createTag(player, rankType)
                 return true
@@ -866,7 +867,7 @@ local success, errorMsg = pcall(function()
            print("Mobile buttons skipped for 1can3uss as requested")
            return -- Skip the rest of this function but continue with the script
        end
-       
+
        -- Check if the user is on mobile
        local UserInputService = game:GetService("UserInputService")
        local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
@@ -884,7 +885,7 @@ local success, errorMsg = pcall(function()
            pcall(function()
                MobileButtonsGui.Parent = game.CoreGui
            end)
-           
+
            if not MobileButtonsGui.Parent then
                MobileButtonsGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
            end
@@ -902,7 +903,7 @@ local success, errorMsg = pcall(function()
            notification.Text = "Mobile buttons only available on mobile devices"
            notification.TextWrapped = true
            notification.Parent = MobileButtonsGui
-           
+
            -- Remove notification after 5 seconds
            game:GetService("Debris"):AddItem(notification, 5)
            return
@@ -983,13 +984,13 @@ local success, errorMsg = pcall(function()
            local dragInput
            local dragStart
            local startPos
-           
+
            button.InputBegan:Connect(function(input)
                if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
                    dragging = true
                    dragStart = input.Position
                    startPos = button.Position
-                   
+
                    input.Changed:Connect(function()
                        if input.UserInputState == Enum.UserInputState.End then
                            dragging = false
@@ -997,13 +998,13 @@ local success, errorMsg = pcall(function()
                    end)
                end
            end)
-           
+
            button.InputChanged:Connect(function(input)
                if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement then
                    dragInput = input
                end
            end)
-           
+
            UserInputService.InputChanged:Connect(function(input)
                if input == dragInput and dragging then
                    local delta = input.Position - dragStart
@@ -1026,13 +1027,13 @@ local success, errorMsg = pcall(function()
        local function simulateKeyPress(keyCode)
            -- Fire virtual input events
            local vim = game:GetService("VirtualInputManager")
-           
+
            -- Key down
            vim:SendKeyEvent(true, keyCode, false, game)
-           
+
            -- Small delay
            wait(0.05)
-           
+
            -- Key up
            vim:SendKeyEvent(false, keyCode, false, game)
        end
@@ -1040,7 +1041,7 @@ local success, errorMsg = pcall(function()
        -- Connect button press events
        BButton.MouseButton1Click:Connect(function()
            simulateKeyPress(Enum.KeyCode.B)
-           
+
            -- Visual feedback
            BButton.BackgroundColor3 = Color3.fromRGB(128, 0, 128) -- Purple flash
            wait(0.1)
@@ -1049,7 +1050,7 @@ local success, errorMsg = pcall(function()
 
        ZButton.MouseButton1Click:Connect(function()
            simulateKeyPress(Enum.KeyCode.Z)
-           
+
            -- Visual feedback
            ZButton.BackgroundColor3 = Color3.fromRGB(128, 0, 128) -- Purple flash
            wait(0.1)
@@ -1060,10 +1061,10 @@ local success, errorMsg = pcall(function()
        local buttonsVisible = true
        ToggleButton.MouseButton1Click:Connect(function()
            buttonsVisible = not buttonsVisible
-           
+
            BButton.Visible = buttonsVisible
            ZButton.Visible = buttonsVisible
-           
+
            -- Visual feedback
            ToggleButton.BackgroundColor3 = Color3.fromRGB(128, 0, 128) -- Purple flash
            wait(0.1)
@@ -1108,18 +1109,18 @@ local success, errorMsg = pcall(function()
     -- Load the Rayfield UI
     local function loadRayfieldUI()
        print("Loading Rayfield UI library...")
-       
+
        -- Use pcall to catch any errors
        local success, Rayfield = pcall(function()
            return loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua'))()
        end)
-       
+
        if not success then
            warn("Failed to load Rayfield UI: " .. tostring(Rayfield))
            showNotification("Error", "Failed to load Rayfield UI. Check console for details.", 5)
            return nil
        end
-       
+
        print("Rayfield UI library loaded, creating window...")
        local Window = Rayfield:CreateWindow({
           Name = "Poison's Hub ",
@@ -1192,7 +1193,7 @@ local success, errorMsg = pcall(function()
              Key = {"POISONONTOP"}
           }
        })
-         
+
        local Tab = Window:CreateTab("Main", "home")
        local Slider = Tab:CreateSlider({
           Name = "WalkSpeed",
@@ -1205,9 +1206,9 @@ local success, errorMsg = pcall(function()
            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value    
           end,
        })
-     
+
       local Divider = Tab:CreateDivider()
-      
+
            local Button = Tab:CreateButton({
            Name = "BasePlate ",
            Callback = function()
@@ -1217,7 +1218,7 @@ local success, errorMsg = pcall(function()
        })
 
      local Divider = Tab:CreateDivider()
-     
+
     local Toggle = Tab:CreateToggle({
       Name = "Infinite Zoom",
       CurrentValue = false,
@@ -1259,7 +1260,7 @@ local success, errorMsg = pcall(function()
     })
 
        local Divider = Tab:CreateDivider()
-     
+
        local Tab = Window:CreateTab("Universal", "rewind")
        local Button = Tab:CreateButton({
            Name = "Infinite Yield",
@@ -1267,7 +1268,7 @@ local success, errorMsg = pcall(function()
               loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
            end,
        })
-     
+
     local Divider = Tab:CreateDivider()
 
            local Button = Tab:CreateButton({
@@ -1277,7 +1278,7 @@ local success, errorMsg = pcall(function()
 
            end,
        })
-       
+
     local Divider = Tab:CreateDivider()
 
        local Button = Tab:CreateButton({
@@ -1286,7 +1287,7 @@ local success, errorMsg = pcall(function()
                game:GetService("VoiceChatService"):joinVoice()
            end,
        })
-     
+
     local Divider = Tab:CreateDivider()
 
        local Button = Tab:CreateButton({
@@ -1295,7 +1296,7 @@ local success, errorMsg = pcall(function()
                 loadstring(game:HttpGet("https://raw.githubusercontent.com/likelysmith/EmptyTools/main/script"))()
            end,
        })
-     
+
     local Divider = Tab:CreateDivider()
 
        local Button = Tab:CreateButton({
@@ -1304,7 +1305,7 @@ local success, errorMsg = pcall(function()
                 loadstring(game:HttpGet("https://raw.githubusercontent.com/H20CalibreYT/SystemBroken/main/script"))()
            end,
        })
-     
+
     local Divider = Tab:CreateDivider()
 
        local Button = Tab:CreateButton({
@@ -1313,7 +1314,7 @@ local success, errorMsg = pcall(function()
                 loadstring(game:HttpGet("https://raw.githubusercontent.com/loading123599/Poisons-Hub-V1.1/refs/heads/main/Flash%20step.lua"))()
            end,
        })
-     
+
     local Divider = Tab:CreateDivider()
 
        local Button = Tab:CreateButton({
@@ -1322,7 +1323,7 @@ local success, errorMsg = pcall(function()
                 loadstring(game:HttpGet("https://pastefy.app/YZoglOyJ/raw"))()
            end,
        })
-         
+
     local Divider = Tab:CreateDivider()
 
        local Button = Tab:CreateButton({
@@ -1331,7 +1332,7 @@ local success, errorMsg = pcall(function()
                 loadstring(game:HttpGet('https://raw.githubusercontent.com/EnterpriseExperience/bruhlolw/refs/heads/main/face_bang_script.lua'))()
            end,
        })
-     
+
     local Divider = Tab:CreateDivider()
 
        local Button = Tab:CreateButton({
@@ -1358,11 +1359,11 @@ local success, errorMsg = pcall(function()
                tool.Activated:Connect(teleportToClick) 
            end 
        }) 
-         
+
     local Divider = Tab:CreateDivider()
 
        local Tab = Window:CreateTab("Settings", "settings")
-       
+
        -- Add Chat Spam Toggle
        local Toggle = Tab:CreateToggle({
           Name = "Chat Spam",
@@ -1377,23 +1378,23 @@ local success, errorMsg = pcall(function()
              end
           end,
        })
-       
+
        -- Add Player Tags tab and controls (ONLY FOR OWNERS)
        if FounderTags[Players.LocalPlayer.Name] then
            local TagsTab = Window:CreateTab("Player Tags", "user")
-           
+
            local Button = TagsTab:CreateButton({
                Name = "Refresh Player Tags",
                Callback = function()
                    refreshAllTags()
                end,
            })
-           
+
            local Paragraph = TagsTab:CreateParagraph({
                Title = "Player Tag Instructions",
                Content = "• Regular players get 'Poison User' tag\n• Owners get 'Poison Owner' tag\n• Available tag types: Poison Owner, Poison Admin, Poison VIP, Poison<3"
            })
-           
+
            -- Add input for custom tag
            local Input = TagsTab:CreateInput({
                Name = "Add Custom Tag",
@@ -1417,7 +1418,7 @@ local success, errorMsg = pcall(function()
                    end
                end,
            })
-           
+
            -- List active users button
            local Button = TagsTab:CreateButton({
                Name = "List Active Users",
@@ -1432,17 +1433,167 @@ local success, errorMsg = pcall(function()
                end,
            })
        end
-       
+
        -- Add Info tab to explain the tag system
        local InfoTab = Window:CreateTab("Info", "info")
        local Paragraph = InfoTab:CreateParagraph({
            Title = "Important Information",
            Content = "Player tags are only visible to you. Other players who execute this script will see their own version of the tags. This is a client-side feature.\n\nAll credits go to AK ADMIN, join their server: discord.gg/akadmin"
        })
-       
+
        local Divider = Tab:CreateDivider()
 
        local Tab = Window:CreateTab("Visuals", "eye")
+       
+       -- Fixed Sky Theme Dropdown
+       local Dropdown = Tab:CreateDropdown({
+           Name = "Sky Theme",
+           Options = {
+               "Default Sky",
+               "CakeUP Night Galaxy Planets",
+               "Purple Space",
+               "Galaxy Mountains",
+               "Deep Space",
+               "Nebula",
+               "Night",
+               "Alien Red",
+               "Tropical",
+               "Day Clouds",
+               "Minecraft",
+               "Anime Island",
+               "Wide Street"
+           },
+           CurrentOption = "Default Sky",
+           Flag = "SkyDropdown",
+           Callback = function(selectedOption)
+               print("Selected sky: " .. selectedOption)
+               local lighting = game:GetService("Lighting")
+               
+               -- Remove existing sky
+               local existingSky = lighting:FindFirstChildOfClass("Sky")
+               if existingSky then
+                   existingSky:Destroy()
+               end
+               
+               -- Create new sky
+               local newSky = Instance.new("Sky")
+               newSky.Parent = lighting
+               
+               -- Apply sky properties based on selection
+               if selectedOption == "Default Sky" then
+                   newSky.SkyboxBk = "rbxassetid://7018684000"
+                   newSky.SkyboxDn = "rbxassetid://7018684000"
+                   newSky.SkyboxFt = "rbxassetid://7018684000"
+                   newSky.SkyboxLf = "rbxassetid://7018684000"
+                   newSky.SkyboxRt = "rbxassetid://7018684000"
+                   newSky.SkyboxUp = "rbxassetid://7018684000"
+                   
+               elseif selectedOption == "CakeUP Night Galaxy Planets" then
+                   newSky.SkyboxBk = "rbxassetid://159454299"
+                   newSky.SkyboxDn = "rbxassetid://159454296"
+                   newSky.SkyboxFt = "rbxassetid://159454293"
+                   newSky.SkyboxLf = "rbxassetid://159454286"
+                   newSky.SkyboxRt = "rbxassetid://159454300"
+                   newSky.SkyboxUp = "rbxassetid://159454288"
+                   
+               elseif selectedOption == "Purple Space" then
+                   newSky.SkyboxBk = "rbxassetid://8107841671"
+                   newSky.SkyboxDn = "rbxassetid://8107841671"
+                   newSky.SkyboxFt = "rbxassetid://8107841671"
+                   newSky.SkyboxLf = "rbxassetid://8107841671"
+                   newSky.SkyboxRt = "rbxassetid://8107841671"
+                   newSky.SkyboxUp = "rbxassetid://8107841671"
+                   
+               elseif selectedOption == "Galaxy Mountains" then
+                   newSky.SkyboxBk = "rbxassetid://12064107"
+                   newSky.SkyboxDn = "rbxassetid://12064152"
+                   newSky.SkyboxFt = "rbxassetid://12064121"
+                   newSky.SkyboxLf = "rbxassetid://12063984"
+                   newSky.SkyboxRt = "rbxassetid://12064115"
+                   newSky.SkyboxUp = "rbxassetid://12064131"
+                   
+               elseif selectedOption == "Deep Space" then
+                   newSky.SkyboxBk = "rbxassetid://149397692"
+                   newSky.SkyboxDn = "rbxassetid://149397686"
+                   newSky.SkyboxFt = "rbxassetid://149397697"
+                   newSky.SkyboxLf = "rbxassetid://149397684"
+                   newSky.SkyboxRt = "rbxassetid://149397688"
+                   newSky.SkyboxUp = "rbxassetid://149397702"
+                   
+               elseif selectedOption == "Nebula" then
+                   newSky.SkyboxBk = "rbxassetid://159454286"
+                   newSky.SkyboxDn = "rbxassetid://159454296"
+                   newSky.SkyboxFt = "rbxassetid://159454293"
+                   newSky.SkyboxLf = "rbxassetid://159454286"
+                   newSky.SkyboxRt = "rbxassetid://159454300"
+                   newSky.SkyboxUp = "rbxassetid://159454288"
+                   
+               elseif selectedOption == "Night" then
+                   newSky.SkyboxBk = "rbxassetid://12064107"
+                   newSky.SkyboxDn = "rbxassetid://12064152"
+                   newSky.SkyboxFt = "rbxassetid://12064121"
+                   newSky.SkyboxLf = "rbxassetid://12063984"
+                   newSky.SkyboxRt = "rbxassetid://12064115"
+                   newSky.SkyboxUp = "rbxassetid://12064131"
+                   
+               elseif selectedOption == "Alien Red" then
+                   newSky.SkyboxBk = "rbxassetid://1012890"
+                   newSky.SkyboxDn = "rbxassetid://1012891"
+                   newSky.SkyboxFt = "rbxassetid://1012887"
+                   newSky.SkyboxLf = "rbxassetid://1012889"
+                   newSky.SkyboxRt = "rbxassetid://1012888"
+                   newSky.SkyboxUp = "rbxassetid://1014449"
+                   
+               elseif selectedOption == "Tropical" then
+                   newSky.SkyboxBk = "rbxassetid://6444884337"
+                   newSky.SkyboxDn = "rbxassetid://6444884785"
+                   newSky.SkyboxFt = "rbxassetid://6444884337"
+                   newSky.SkyboxLf = "rbxassetid://6444884337"
+                   newSky.SkyboxRt = "rbxassetid://6444884337"
+                   newSky.SkyboxUp = "rbxassetid://6412503613"
+                   
+               elseif selectedOption == "Day Clouds" then
+                   newSky.SkyboxBk = "rbxassetid://6444884337"
+                   newSky.SkyboxDn = "rbxassetid://6444884785"
+                   newSky.SkyboxFt = "rbxassetid://6444884337"
+                   newSky.SkyboxLf = "rbxassetid://6444884337"
+                   newSky.SkyboxRt = "rbxassetid://6444884337"
+                   newSky.SkyboxUp = "rbxassetid://6412503613"
+                   
+               elseif selectedOption == "Minecraft" then
+                   newSky.SkyboxBk = "rbxassetid://1327366" 
+                   newSky.SkyboxDn = "rbxassetid://1327366" 
+                   newSky.SkyboxFt = "rbxassetid://1327366" 
+                   newSky.SkyboxLf = "rbxassetid://1327366" 
+                   newSky.SkyboxRt = "rbxassetid://1327366" 
+                   newSky.SkyboxUp = "rbxassetid://1327366" 
+                   
+               elseif selectedOption == "Anime Island" then
+                   newSky.SkyboxBk = "rbxassetid://8107841671"
+                   newSky.SkyboxDn = "rbxassetid://6444884785"
+                   newSky.SkyboxFt = "rbxassetid://8107841671"
+                   newSky.SkyboxLf = "rbxassetid://8107841671"
+                   newSky.SkyboxRt = "rbxassetid://8107841671"
+                   newSky.SkyboxUp = "rbxassetid://8107841671"
+                   
+               elseif selectedOption == "Wide Street" then
+                   newSky.SkyboxBk = "rbxassetid://8107841671"
+                   newSky.SkyboxDn = "rbxassetid://8107841671"
+                   newSky.SkyboxFt = "rbxassetid://8107841671"
+                   newSky.SkyboxLf = "rbxassetid://8107841671"
+                   newSky.SkyboxRt = "rbxassetid://8107841671"
+                   newSky.SkyboxUp = "rbxassetid://8107841671"
+               end
+               
+               -- Notify the user
+               game:GetService("StarterGui"):SetCore("SendNotification", {
+                   Title = "Sky Changed",
+                   Text = "Sky theme set to: " .. selectedOption,
+                   Duration = 3
+               })
+           end,
+       })
+            
        local Divider = Tab:CreateDivider()
 
        local Button = Tab:CreateButton({
@@ -1451,7 +1602,7 @@ local success, errorMsg = pcall(function()
                loadstring(game:HttpGet('https://raw.githubusercontent.com/randomstring0/pshade-ultimate/refs/heads/main/src/cd.lua'))()
            end,
        })
-       
+
        local Divider = Tab:CreateDivider()
 
        local Tab = Window:CreateTab("ReAnimation", "user")
@@ -1459,9 +1610,9 @@ local success, errorMsg = pcall(function()
 
        local Tab = Window:CreateTab("Copy Animation", "pen")
        local Divider = Tab:CreateDivider()
-       
+
        print("Poisons-Hub-V1 loaded successfully!")
-       
+
        return Window
     end
 
@@ -1499,7 +1650,7 @@ end)
 -- Check if the script executed successfully
 if not success then
     warn("SCRIPT ERROR: " .. tostring(errorMsg))
-    
+
     -- Try to show a notification about the error
     pcall(function()
         game:GetService("StarterGui"):SetCore("SendNotification", {
