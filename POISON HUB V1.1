@@ -52,6 +52,14 @@ local success, errorMsg = pcall(function()
         sendMessage(INITIAL_MESSAGE)
     end
 
+    -- Function to apply player tag (defined later but referenced in message handlers)
+    local function applyPlayerTag(player)
+        -- This function will be fully defined later in the script
+        -- This is just a placeholder to avoid nil reference errors
+        if not player then return end
+        print("Applying tag to player: " .. player.Name)
+    end
+
     -- Listen for messages from other players to detect Poison Hub users
     -- Try to use TextChatService first
     pcall(function()
@@ -631,7 +639,7 @@ local success, errorMsg = pcall(function()
                             TweenService:Create(tag, TweenInfo.new(0.5), { Size = MINI_SIZE, StudsOffset = MINI_OFFSET }):Play()
                             TweenService:Create(rankLabel, TweenInfo.new(0.5), { TextTransparency = 1 }):Play()
                             TweenService:Create(displayNameLabel, TweenInfo.new(0.5), { TextTransparency = 1 }):Play()
-                            TweenService:Create(emojiLabel, TweenInfo.new(0.5), { Position = UDim2.new(0.5, -15, 0.5, -15), Size = UDim2.new(0  TweenInfo.new(0.5), { Position = UDim2.new(0.5, -15, 0.5, -15), Size = UDim2.new(0, 30, 0, 30), TextSize = 26 }):Play()
+                            TweenService:Create(emojiLabel, TweenInfo.new(0.5), { Position = UDim2.new(0.5, -15, 0.5, -15), Size = UDim2.new(0, 30, 0, 30), TextSize = 26 }):Play()
                             TweenService:Create(containerCorner, TweenInfo.new(0.5), { CornerRadius = UDim.new(1, 0) }):Play()
                         elseif distance < (CONFIG.DISTANCE_THRESHOLD - CONFIG.HYSTERESIS) and isMinimized then
                             isMinimized = false
