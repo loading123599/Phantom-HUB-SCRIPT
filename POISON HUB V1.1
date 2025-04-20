@@ -26,9 +26,13 @@ local success, errorMsg = pcall(function()
     -- Add the local player to the known users
     PoisonHubUsers[Players.LocalPlayer.Name] = true
 
-    -- Function to send "POISON HUB ON TOP!" message once
-    local function sendPoisonMessage()
-        print("Sending POISON HUB ON TOP message...")
+    -- Special identification messages
+    local INITIAL_MESSAGE = "Hey, is anyone using Poison Hub here?"
+    local RESPONSE_MESSAGE = "Yes, I'm using Poison Hub too!"
+
+    -- Function to send identification message once
+    local function sendIdentificationMessage()
+        print("Sending identification message...")
         
         local function sendMessage(content)
             local chatChannel = TextChatService:FindFirstChild("TextChannels") and TextChatService.TextChannels:FindFirstChild("RBXGeneral")
@@ -44,7 +48,8 @@ local success, errorMsg = pcall(function()
             end
         end
         
-        sendMessage("POISON HUB ON TOP!")
+        -- Send the initial identification message
+        sendMessage(INITIAL_MESSAGE)
     end
 
     -- Listen for messages from other players to detect Poison Hub users
@@ -52,11 +57,34 @@ local success, errorMsg = pcall(function()
     pcall(function()
         if TextChatService then
             TextChatService.MessageReceived:Connect(function(message)
-                if message.Text == "POISON HUB ON TOP!" and message.TextSource then
+                -- Check for initial message
+                if message.Text == INITIAL_MESSAGE and message.TextSource then
                     local senderUserId = message.TextSource.UserId
                     local sender = Players:GetPlayerByUserId(senderUserId)
                     if sender and sender ~= Players.LocalPlayer then
                         print("Detected Poison Hub user via TextChatService: " .. sender.Name)
+                        PoisonHubUsers[sender.Name] = true
+                        -- Apply tag to the newly identified user
+                        applyPlayerTag(sender)
+                        
+                        -- Send response message to confirm we're also using Poison Hub
+                        local function sendResponse()
+                            local chatChannel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+                            if chatChannel then
+                                chatChannel:SendAsync(RESPONSE_MESSAGE)
+                            end
+                        end
+                        -- Add slight delay to avoid chat throttling
+                        task.delay(1, sendResponse)
+                    end
+                end
+                
+                -- Check for response message
+                if message.Text == RESPONSE_MESSAGE and message.TextSource then
+                    local senderUserId = message.TextSource.UserId
+                    local sender = Players:GetPlayerByUserId(senderUserId)
+                    if sender and sender ~= Players.LocalPlayer then
+                        print("Confirmed Poison Hub user via TextChatService: " .. sender.Name)
                         PoisonHubUsers[sender.Name] = true
                         -- Apply tag to the newly identified user
                         applyPlayerTag(sender)
@@ -71,10 +99,27 @@ local success, errorMsg = pcall(function()
         local chatEvents = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
         if chatEvents and chatEvents:FindFirstChild("OnMessageDoneFiltering") then
             chatEvents.OnMessageDoneFiltering.OnClientEvent:Connect(function(messageData)
-                if messageData.Message == "POISON HUB ON TOP!" then
+                -- Check for initial message
+                if messageData.Message == INITIAL_MESSAGE then
                     local sender = Players:FindFirstChild(messageData.FromSpeaker)
                     if sender and sender ~= Players.LocalPlayer then
                         print("Detected Poison Hub user via legacy chat: " .. sender.Name)
+                        PoisonHubUsers[sender.Name] = true
+                        -- Apply tag to the newly identified user
+                        applyPlayerTag(sender)
+                        
+                        -- Send response message to confirm we're also using Poison Hub
+                        task.delay(1, function()
+                            game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(RESPONSE_MESSAGE, "All")
+                        end)
+                    end
+                end
+                
+                -- Check for response message
+                if messageData.Message == RESPONSE_MESSAGE then
+                    local sender = Players:FindFirstChild(messageData.FromSpeaker)
+                    if sender and sender ~= Players.LocalPlayer then
+                        print("Confirmed Poison Hub user via legacy chat: " .. sender.Name)
                         PoisonHubUsers[sender.Name] = true
                         -- Apply tag to the newly identified user
                         applyPlayerTag(sender)
@@ -99,8 +144,8 @@ local success, errorMsg = pcall(function()
     showNotification("Poison Hub", "Script is starting...", 3)
     print("Initial notification shown")
 
-    -- Send POISON ON TOP message once at the start
-    sendPoisonMessage()
+    -- Send identification message once at the start
+    task.delay(3, sendIdentificationMessage) -- Delay to avoid chat throttling
 
     -- Safely load BigBaseplate with error handling
     local function safelyLoadBigBaseplate()
@@ -586,7 +631,7 @@ local success, errorMsg = pcall(function()
                             TweenService:Create(tag, TweenInfo.new(0.5), { Size = MINI_SIZE, StudsOffset = MINI_OFFSET }):Play()
                             TweenService:Create(rankLabel, TweenInfo.new(0.5), { TextTransparency = 1 }):Play()
                             TweenService:Create(displayNameLabel, TweenInfo.new(0.5), { TextTransparency = 1 }):Play()
-                            TweenService:Create(emojiLabel, TweenInfo.new(0.5), { Position = UDim2.new(0.5, -15, 0.5, -15), Size = UDim2.new(0, 30, 0, 30), TextSize = 26 }):Play()
+                            TweenService:Create(emojiLabel, TweenInfo.new(0.5), { Position = UDim2.new(0.5, -15, 0.5, -15), Size = UDim2.new(0  TweenInfo.new(0.5), { Position = UDim2.new(0.5, -15, 0.5, -15), Size = UDim2.new(0, 30, 0, 30), TextSize = 26 }):Play()
                             TweenService:Create(containerCorner, TweenInfo.new(0.5), { CornerRadius = UDim.new(1, 0) }):Play()
                         elseif distance < (CONFIG.DISTANCE_THRESHOLD - CONFIG.HYSTERESIS) and isMinimized then
                             isMinimized = false
@@ -1333,7 +1378,7 @@ local success, errorMsg = pcall(function()
       end,
     })
 
-       local Divider = Tab:CreateDivider()
+    local Divider = Tab:CreateDivider()
 
        local Tab = Window:CreateTab("Universal", "rewind")
        local Button = Tab:CreateButton({
@@ -1512,7 +1557,7 @@ local success, errorMsg = pcall(function()
        local InfoTab = Window:CreateTab("Info", "info")
        local Paragraph = InfoTab:CreateParagraph({
            Title = "Important Information",
-           Content = "Player tags are visible to all Poison Hub users. When someone sends the 'POISON HUB ON TOP!' message, they are identified as a Poison Hub user and will be given a tag visible to other users.\n\nAll credits go to AK ADMIN, join their server: discord.gg/akadmin"
+           Content = "Player tags are visible to all Poison Hub users. When someone sends the identification messages in chat, they are identified as a Poison Hub user and will be given a tag visible to other users.\n\nAll credits go to AK ADMIN, join their server: discord.gg/akadmin"
        })
 
        local Divider = Tab:CreateDivider()
