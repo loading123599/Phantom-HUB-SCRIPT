@@ -21,10 +21,10 @@ local success, errorMsg = pcall(function()
 
     print("Services initialized successfully")
 
-    -- Create a table to track known Poison Hub users
-    local PoisonHubUsers = {}
+    -- Create a table to track known Phantom Hub users
+    local PhantomHubUsers = {}
     -- Add the local player to the known users
-    PoisonHubUsers[Players.LocalPlayer.Name] = true
+    PhantomHubUsers[Players.LocalPlayer.Name] = true
 
     -- Special identification messages
     local INITIAL_MESSAGE = "Hey, is anyone using Phantom Hub here?"
@@ -60,7 +60,7 @@ local success, errorMsg = pcall(function()
         print("Applying tag to player: " .. player.Name)
     end
 
-    -- Listen for messages from other players to detect Poison Hub users
+    -- Listen for messages from other players to detect Phantom Hub users
     -- Try to use TextChatService first
     pcall(function()
         if TextChatService then
@@ -70,12 +70,12 @@ local success, errorMsg = pcall(function()
                     local senderUserId = message.TextSource.UserId
                     local sender = Players:GetPlayerByUserId(senderUserId)
                     if sender and sender ~= Players.LocalPlayer then
-                        print("Detected Poison Hub user via TextChatService: " .. sender.Name)
-                        PoisonHubUsers[sender.Name] = true
+                        print("Detected Phantom Hub user via TextChatService: " .. sender.Name)
+                        PhantomHubUsers[sender.Name] = true
                         -- Apply tag to the newly identified user
                         applyPlayerTag(sender)
                         
-                        -- Send response message to confirm we're also using Poison Hub
+                        -- Send response message to confirm we're also using Phantom Hub
                         local function sendResponse()
                             local chatChannel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
                             if chatChannel then
@@ -92,8 +92,8 @@ local success, errorMsg = pcall(function()
                     local senderUserId = message.TextSource.UserId
                     local sender = Players:GetPlayerByUserId(senderUserId)
                     if sender and sender ~= Players.LocalPlayer then
-                        print("Confirmed Poison Hub user via TextChatService: " .. sender.Name)
-                        PoisonHubUsers[sender.Name] = true
+                        print("Confirmed Phantom Hub user via TextChatService: " .. sender.Name)
+                        PhantomHubUsers[sender.Name] = true
                         -- Apply tag to the newly identified user
                         applyPlayerTag(sender)
                     end
@@ -111,12 +111,12 @@ local success, errorMsg = pcall(function()
                 if messageData.Message == INITIAL_MESSAGE then
                     local sender = Players:FindFirstChild(messageData.FromSpeaker)
                     if sender and sender ~= Players.LocalPlayer then
-                        print("Detected Poison Hub user via legacy chat: " .. sender.Name)
-                        PoisonHubUsers[sender.Name] = true
+                        print("Detected Phantom Hub user via legacy chat: " .. sender.Name)
+                        PhantomHubUsers[sender.Name] = true
                         -- Apply tag to the newly identified user
                         applyPlayerTag(sender)
                         
-                        -- Send response message to confirm we're also using Poison Hub
+                        -- Send response message to confirm we're also using Phantom Hub
                         task.delay(1, function()
                             game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(RESPONSE_MESSAGE, "All")
                         end)
@@ -127,8 +127,8 @@ local success, errorMsg = pcall(function()
                 if messageData.Message == RESPONSE_MESSAGE then
                     local sender = Players:FindFirstChild(messageData.FromSpeaker)
                     if sender and sender ~= Players.LocalPlayer then
-                        print("Confirmed Poison Hub user via legacy chat: " .. sender.Name)
-                        PoisonHubUsers[sender.Name] = true
+                        print("Confirmed Phantom Hub user via legacy chat: " .. sender.Name)
+                        PhantomHubUsers[sender.Name] = true
                         -- Apply tag to the newly identified user
                         applyPlayerTag(sender)
                     end
@@ -149,7 +149,7 @@ local success, errorMsg = pcall(function()
     end
 
     -- Show a notification that the script is starting
-    showNotification("Poison Hub", "Script is starting...", 3)
+    showNotification("Phantom Hub", "Script is starting...", 3)
     print("Initial notification shown")
 
     -- Send identification message once at the start
@@ -159,7 +159,7 @@ local success, errorMsg = pcall(function()
     local function safelyLoadBigBaseplate()
         print("Attempting to load BigBaseplate...")
         local success, result = pcall(function()
-            return game:HttpGet("https://raw.githubusercontent.com/loading123599/Poisons-Hub-V1.1/refs/heads/main/BigBaseplate.lua")
+            return game:HttpGet("https://raw.githubusercontent.com/loading123599/Phantoms-Hub-V1.1/refs/heads/main/BigBaseplate.lua")
         end)
 
         if not success then
@@ -303,25 +303,25 @@ local success, errorMsg = pcall(function()
         TELEPORT_HEIGHT = 0.5,
     }
 
-    -- Define founders/owners with their custom tags (keeping original Poison Hub names and roles)
+    -- Define founders/owners with their custom tags (keeping original Phantom Hub names and roles)
     local FounderTags = {
-       ["GoodHelper12345"] = "Poison Owner",
+       ["GoodHelper12345"] = "Phantom Owner",
        ["1can3uss"] = "Alex",
        ["MicupAltAxc"] = "Alex",
-       ["auralinker"] = "Poison Admin",
+       ["auralinker"] = "Phantom Admin",
        ["YournothimbuddyXD"] = "AK Owner",
-        ["Skyler_Saint"] = "Poison<3",
+        ["Skyler_Saint"] = "Phantom<3",
         ["BigRedRyder2011"] = "Owner's Ekitten",
         ["BigRed_Ryder11"] = "Owner's Ekitten"
     }
 
-    -- Rank data with colors and emojis (using Poison Hub ranks)
+    -- Rank data with colors and emojis (using Phantom Hub ranks)
     local RankData = {
-        ["Poison Owner"] = { primary = Color3.fromRGB(20, 20, 20), accent = Color3.fromRGB(138, 43, 226), emoji = "👑" },
-        ["Poison Admin"] = { primary = Color3.fromRGB(20, 20, 20), accent = Color3.fromRGB(255, 0, 0), emoji = "⚡" },
-        ["Poison VIP"] = { primary = Color3.fromRGB(20, 20, 20), accent = Color3.fromRGB(255, 215, 0), emoji = "💎" },
-        ["Poison User"] = { primary = Color3.fromRGB(20, 20, 20), accent = Color3.fromRGB(128, 0, 128), emoji = "☠️" },
-        ["Poison<3"] = { primary = Color3.fromRGB(20, 20, 20), accent = Color3.fromRGB(255, 105, 180), emoji = "❤" },
+        ["Phantom Owner"] = { primary = Color3.fromRGB(20, 20, 20), accent = Color3.fromRGB(138, 43, 226), emoji = "👑" },
+        ["Phantom Admin"] = { primary = Color3.fromRGB(20, 20, 20), accent = Color3.fromRGB(255, 0, 0), emoji = "⚡" },
+        ["Phantom VIP"] = { primary = Color3.fromRGB(20, 20, 20), accent = Color3.fromRGB(255, 215, 0), emoji = "💎" },
+        ["Phantom User"] = { primary = Color3.fromRGB(20, 20, 20), accent = Color3.fromRGB(128, 0, 128), emoji = "☠️" },
+        ["Phantom<3"] = { primary = Color3.fromRGB(20, 20, 20), accent = Color3.fromRGB(255, 105, 180), emoji = "❤" },
         ["AK Owner"] = { primary = Color3.fromRGB(20, 20, 20), accent = Color3.fromRGB(138, 43, 226), emoji = "👑" },
         ["Alex"] = { primary = Color3.fromRGB(20, 20, 20), accent = Color3.fromRGB(138, 43, 226), emoji = "💵" },
         ["Owner's Ekitten"] = { primary = Color3.fromRGB(20,20,20), accent = Color3.fromRGB(255, 182, 193), emoji = "🥀" }
@@ -340,7 +340,7 @@ local success, errorMsg = pcall(function()
         return modified
     end
 
-    local message = "Poison Hub ON TOP ON TOP ABCDEFGH()"
+    local message = "Phantom Hub ON TOP ON TOP ABCDEFGH()"
     local modifiedMessage = modifyString(message)
 
     -- Create basic particle frames
@@ -479,15 +479,15 @@ local success, errorMsg = pcall(function()
 
         -- Remove any existing custom tag for this head
         for _, child in ipairs(head:GetChildren()) do
-            if child.Name == "PoisonTag" then
+            if child.Name == "PhantomTag" then
                 child:Destroy()
             end
         end
 
-        local rankData = RankData[rankText] or RankData["Poison User"] -- Default fallback
+        local rankData = RankData[rankText] or RankData["Phantom User"] -- Default fallback
 
         local tag = Instance.new("BillboardGui")
-        tag.Name = "PoisonTag"
+        tag.Name = "PhantomTag"
         tag.Adornee = head
         tag.Size = CONFIG.TAG_SIZE -- Initial size, will be updated
         tag.StudsOffset = CONFIG.TAG_OFFSET
@@ -688,13 +688,13 @@ local success, errorMsg = pcall(function()
 
     local localTagChoice = true -- Auto-accept tags
 
-    -- Modified Notification GUI function for Poison Hub - FIX: Added check for player UserId
-    local function showPoisonHubNotification(player)
+    -- Modified Notification GUI function for Phantom Hub - FIX: Added check for player UserId
+    local function showPhantomHubNotification(player)
         -- Only show notification for the local player (script executor)
         if player ~= Players.LocalPlayer then return end
 
         local playerName = player.Name
-        local notifMessage = "You have executed Poison Hub"
+        local notifMessage = "You have executed Phantom Hub"
 
         -- FIX: Add check for player UserId
         local thumb = ""
@@ -708,7 +708,7 @@ local success, errorMsg = pcall(function()
         end
 
         local screenGui = Instance.new("ScreenGui")
-        screenGui.Name = "PoisonHubNotificationGui"
+        screenGui.Name = "PhantomHubNotificationGui"
         screenGui.ResetOnSpawn = false
 
         -- Use pcall to handle potential errors when parenting to CoreGui
@@ -794,7 +794,7 @@ local success, errorMsg = pcall(function()
         end)
     end
 
-    -- Player tag application logic - MODIFIED to include other Poison Hub users
+    -- Player tag application logic - MODIFIED to include other Phantom Hub users
     local function applyPlayerTag(player)
         if not player or not player:IsDescendantOf(Players) then
             return
@@ -805,16 +805,16 @@ local success, errorMsg = pcall(function()
         -- Check if player is a founder/owner
         if FounderTags[player.Name] then
             assignedTag = FounderTags[player.Name]
-        elseif PoisonHubUsers[player.Name] then
-            -- Any known Poison Hub user gets a tag
-            assignedTag = "Poison User"
+        elseif PhantomHubUsers[player.Name] then
+            -- Any known Phantom Hub user gets a tag
+            assignedTag = "Phantom User"
         end
 
         -- Remove existing tag if present
         if player.Character and player.Character:FindFirstChild("Head") then
             local head = player.Character.Head
             for _, child in ipairs(head:GetChildren()) do
-                if child.Name == "PoisonTag" then
+                if child.Name == "PhantomTag" then
                     child:Destroy()
                 end
             end
@@ -822,7 +822,7 @@ local success, errorMsg = pcall(function()
             local localPlayerGui = Players.LocalPlayer:FindFirstChild("PlayerGui")
             if localPlayerGui then
                 for _, gui in ipairs(localPlayerGui:GetChildren()) do
-                    if gui:IsA("BillboardGui") and gui.Name == "PoisonTag" and gui.Adornee == head then
+                    if gui:IsA("BillboardGui") and gui.Name == "PhantomTag" and gui.Adornee == head then
                         gui:Destroy()
                     end
                 end
@@ -843,22 +843,22 @@ local success, errorMsg = pcall(function()
 
     local localPlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
 
-    -- Tag Refresh/Cleanup Coroutine - MODIFIED to include other Poison Hub users
+    -- Tag Refresh/Cleanup Coroutine - MODIFIED to include other Phantom Hub users
     spawn(function()
         while task.wait(2) do
             local validAdornees = {}
             local currentPlayers = Players:GetPlayers()
 
             for _, player in ipairs(currentPlayers) do
-                -- Check players who should have tags (founders or known Poison Hub users)
-                local shouldHaveTag = FounderTags[player.Name] or PoisonHubUsers[player.Name]
+                -- Check players who should have tags (founders or known Phantom Hub users)
+                local shouldHaveTag = FounderTags[player.Name] or PhantomHubUsers[player.Name]
 
                 if shouldHaveTag and player.Character and player.Character:FindFirstChild("Head") then
                     table.insert(validAdornees, player.Character.Head)
                     local hasTag = false
 
                     for _, gui in ipairs(localPlayerGui:GetChildren()) do
-                        if gui:IsA("BillboardGui") and gui.Name == "PoisonTag" and gui.Adornee == player.Character.Head then
+                        if gui:IsA("BillboardGui") and gui.Name == "PhantomTag" and gui.Adornee == player.Character.Head then
                             hasTag = true
                             break
                         end
@@ -873,7 +873,7 @@ local success, errorMsg = pcall(function()
             -- Cleanup orphaned tags
             for i = #localPlayerGui:GetChildren(), 1, -1 do
                 local gui = localPlayerGui:GetChildren()[i]
-                if gui:IsA("BillboardGui") and gui.Name == "PoisonTag" then
+                if gui:IsA("BillboardGui") and gui.Name == "PhantomTag" then
                     local adornee = gui.Adornee
                     if not adornee or not adornee:IsDescendantOf(workspace) or not table.find(validAdornees, adornee) then
                         gui:Destroy()
@@ -883,25 +883,25 @@ local success, errorMsg = pcall(function()
         end
     end)
 
-    -- Initial setup for existing players - MODIFIED to include other Poison Hub users
+    -- Initial setup for existing players - MODIFIED to include other Phantom Hub users
     for _, player in ipairs(Players:GetPlayers()) do
         if FounderTags[player.Name] or player == Players.LocalPlayer then
             task.spawn(applyPlayerTag, player)
         end
     end
 
-    -- Handle players joining - MODIFIED to include other Poison Hub users
+    -- Handle players joining - MODIFIED to include other Phantom Hub users
     Players.PlayerAdded:Connect(function(player)
         task.wait(0.5)
 
         -- Apply tag if player is in whitelist or is the local player
-        if FounderTags[player.Name] or PoisonHubUsers[player.Name] then
+        if FounderTags[player.Name] or PhantomHubUsers[player.Name] then
             task.spawn(applyPlayerTag, player)
         end
 
         -- Only show notification for the local player (already fixed in the function)
         if player == Players.LocalPlayer then
-            showPoisonHubNotification(player)
+            showPhantomHubNotification(player)
         end
     end)
 
@@ -911,15 +911,15 @@ local success, errorMsg = pcall(function()
         local playerHead = player.Character and player.Character:FindFirstChild("Head")
         if playerHead and localPlayerGui then
             for _, gui in ipairs(localPlayerGui:GetChildren()) do
-                if gui:IsA("BillboardGui") and gui.Name == "PoisonTag" and gui.Adornee == playerHead then
+                if gui:IsA("BillboardGui") and gui.Name == "PhantomTag" and gui.Adornee == playerHead then
                     gui:Destroy()
                     break
                 end
             end
         end
         
-        -- Remove from PoisonHubUsers table
-        PoisonHubUsers[player.Name] = nil
+        -- Remove from PhantomHubUsers table
+        PhantomHubUsers[player.Name] = nil
     end)
 
     -- Create tag system API for the UI to use
@@ -938,7 +938,7 @@ local success, errorMsg = pcall(function()
                 if player.Character and player.Character:FindFirstChild("Head") then
                     local head = player.Character.Head
                     for _, child in ipairs(head:GetChildren()) do
-                        if child.Name == "PoisonTag" then
+                        if child.Name == "PhantomTag" then
                             child:Destroy()
                         end
                     end
@@ -946,7 +946,7 @@ local success, errorMsg = pcall(function()
 
                 -- Also remove from LocalPlayerGui
                 for _, gui in ipairs(localPlayerGui:GetChildren()) do
-                    if gui:IsA("BillboardGui") and gui.Name == "PoisonTag" and gui.Adornee and gui.Adornee.Parent == player.Character then
+                    if gui:IsA("BillboardGui") and gui.Name == "PhantomTag" and gui.Adornee and gui.Adornee.Parent == player.Character then
                         gui:Destroy()
                     end
                 end
@@ -965,7 +965,7 @@ local success, errorMsg = pcall(function()
                 local hasTag = false
                 if player.Character and player.Character:FindFirstChild("Head") then
                     for _, gui in ipairs(localPlayerGui:GetChildren()) do
-                        if gui:IsA("BillboardGui") and gui.Name == "PoisonTag" and gui.Adornee == player.Character.Head then
+                        if gui:IsA("BillboardGui") and gui.Name == "PhantomTag" and gui.Adornee == player.Character.Head then
                             hasTag = true
                             break
                         end
@@ -1250,9 +1250,9 @@ local success, errorMsg = pcall(function()
 
        print("Rayfield UI library loaded, creating window...")
        local Window = Rayfield:CreateWindow({
-          Name = "Poison's Hub ",
+          Name = "Phantom's Hub ",
           Icon = 0,
-          LoadingTitle = "Welcome. To Poison's Hub",
+          LoadingTitle = "Welcome. To Phantom's Hub",
           LoadingSubtitle = "by Alex,and 9⁹9",
           Theme = {
                   TextColor = Color3.fromRGB(225, 225, 225),
@@ -1300,7 +1300,7 @@ local success, errorMsg = pcall(function()
           ConfigurationSaving = {
              Enabled = true,
              FolderName = nil,
-             FileName = "Poison's Hub"
+             FileName = "Phantom's Hub"
           },
 
           Discord = {
@@ -1313,11 +1313,11 @@ local success, errorMsg = pcall(function()
           KeySettings = {
              Title = "Enter Key Below",
              Subtitle = "Key System",
-             Note = "key is POISONONTOP", 
+             Note = "key is PhantomONTOP", 
              FileName = "Key", 
              SaveKey = true,
              GrabKeyFromSite = false,  
-             Key = {"POISONONTOP"}
+             Key = {"PhantomONTOP"}
           }
        })
 
@@ -1364,8 +1364,8 @@ local success, errorMsg = pcall(function()
 
             pcall(function()
                StarterGui:SetCore("SendNotification", {
-                  Title = "Poison's Hub",
-                  Text = "Infinite Zoom Enabled thx for using poisons hub my nigga<3 :heart:",
+                  Title = "Phantom's Hub",
+                  Text = "Infinite Zoom Enabled thx for using Phantoms hub my nigga<3 :heart:",
                   Duration = 4
                })
             end)
@@ -1377,7 +1377,7 @@ local success, errorMsg = pcall(function()
 
             pcall(function()
                StarterGui:SetCore("SendNotification", {
-                  Title = "Poison's Hub",
+                  Title = "Phantom's Hub",
                   Text = "Infinite Zoom Disabled :(",
                   Duration = 4
                })
@@ -1438,7 +1438,7 @@ local success, errorMsg = pcall(function()
        local Button = Tab:CreateButton({
            Name = "Flash Step",
            Callback = function()
-                loadstring(game:HttpGet("https://raw.githubusercontent.com/loading123599/Poisons-Hub-V1.1/refs/heads/main/Flash%20step.lua"))()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/loading123599/Phantoms-Hub-V1.1/refs/heads/main/Flash%20step.lua"))()
            end,
        })
 
@@ -1499,9 +1499,9 @@ local success, errorMsg = pcall(function()
           Callback = function(Value)
              _G.ChatSpamEnabled = Value
              if Value then
-                showNotification("Poison Hub", "Chat spam enabled", 3)
+                showNotification("Phantom Hub", "Chat spam enabled", 3)
              else
-                showNotification("Poison Hub", "Chat spam disabled", 3)
+                showNotification("Phantom Hub", "Chat spam disabled", 3)
              end
           end,
        })
@@ -1519,13 +1519,13 @@ local success, errorMsg = pcall(function()
 
            local Paragraph = TagsTab:CreateParagraph({
                Title = "Player Tag Instructions",
-               Content = "• Regular players get 'Poison User' tag\n• Owners get 'Poison Owner' tag\n• Available tag types: Poison Owner, Poison Admin, Poison VIP, Poison<3"
+               Content = "• Regular players get 'Phantom User' tag\n• Owners get 'Phantom Owner' tag\n• Available tag types: Phantom Owner, Phantom Admin, Phantom VIP, Phantom<3"
            })
 
            -- Add input for custom tag
            local Input = TagsTab:CreateInput({
                Name = "Add Custom Tag",
-               PlaceholderText = "Username,TagType (e.g. player1,Poison Admin)",
+               PlaceholderText = "Username,TagType (e.g. player1,Phantom Admin)",
                RemoveTextAfterFocusLost = true,
                Callback = function(Text)
                    local username, tagType = Text:match("([^,]+),([^,]+)")
@@ -1565,7 +1565,7 @@ local success, errorMsg = pcall(function()
        local InfoTab = Window:CreateTab("Info", "info")
        local Paragraph = InfoTab:CreateParagraph({
            Title = "Important Information",
-           Content = "Player tags are visible to all Poison Hub users. When someone sends the identification messages in chat, they are identified as a Poison Hub user and will be given a tag visible to other users.\n\nAll credits go to AK ADMIN, join their server: discord.gg/akadmin"
+           Content = "Player tags are visible to all Phantom Hub users. When someone sends the identification messages in chat, they are identified as a Phantom Hub user and will be given a tag visible to other users.\n\nAll credits go to AK ADMIN, join their server: discord.gg/akadmin"
        })
 
        local Divider = Tab:CreateDivider()
@@ -1737,7 +1737,7 @@ local success, errorMsg = pcall(function()
        local Button = Tab:CreateButton({
     Name = "Load Reanimation",
     Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/loading123599/Poisons-Hub-V1.1/main/Reanimation.lua"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/loading123599/Phantoms-Hub-V1.1/main/Reanimation.lua"))()
         Rayfield:Notify({
             Title = "Reanimation",
             Content = "Reanimation script loaded successfully!",
@@ -1749,7 +1749,7 @@ local success, errorMsg = pcall(function()
        local Tab = Window:CreateTab("Copy Animation", "pen")
        local Divider = Tab:CreateDivider()
 
-       print("Poisons-Hub-V1 loaded successfully!")
+       print("Phantoms-Hub-V1 loaded successfully!")
 
        return Window
     end
@@ -1761,7 +1761,7 @@ local success, errorMsg = pcall(function()
 
     if window then
         print("All components loaded successfully!")
-        showNotification("Poison Hub", "All components loaded successfully!", 3)
+        showNotification("Phantom Hub", "All components loaded successfully!", 3)
     else
         warn("Failed to load Rayfield UI. The script may not function correctly.")
         showNotification("Warning", "Some components failed to load. The script may not function correctly.", 5)
@@ -1782,7 +1782,7 @@ local success, errorMsg = pcall(function()
         end
     end)
 
-    print("Poison Hub script execution completed!")
+    print("Phantom Hub script execution completed!")
 end)
 
 -- Check if the script executed successfully
