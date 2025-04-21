@@ -159,7 +159,7 @@ local success, errorMsg = pcall(function()
     local function safelyLoadBigBaseplate()
         print("Attempting to load BigBaseplate...")
         local success, result = pcall(function()
-            return game:HttpGet("https://raw.githubusercontent.com/loading123599/Phantoms-Hub-V1.1/refs/heads/main/BigBaseplate.lua")
+            return game:HttpGet("https://raw.githubusercontent.com/loading123599/Phantom-Hub-V1.1/refs/heads/main/BigBaseplate.lua")
         end)
 
         if not success then
@@ -1255,7 +1255,6 @@ local success, errorMsg = pcall(function()
           LoadingTitle = "Welcome. To Phantom's Hub",
           LoadingSubtitle = "by Alex, and 9⁹9",
           Theme = {
-                  {
     TextColor = Color3.fromRGB(255, 255, 255),
     Background = Color3.fromRGB(5, 5, 5),
     Topbar = Color3.fromRGB(20, 20, 20),
@@ -1293,8 +1292,8 @@ local success, errorMsg = pcall(function()
 
     InputBackground = Color3.fromRGB(5, 5, 5),
     InputStroke = Color3.fromRGB(50, 50, 50),
-    PlaceholderColor = Color3.fromRGB(120, 120, 120),
-},
+    PlaceholderColor = Color3.fromRGB(120, 120, 120)
+    },
           DisableRayfieldPrompts = false,
           DisableBuildWarnings = false,
 
