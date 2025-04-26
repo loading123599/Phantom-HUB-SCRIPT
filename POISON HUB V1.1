@@ -66,7 +66,7 @@ local success, errorMsg = pcall(function()
         end)
         
         -- Check if player is an owner
-        local isOwner = (Username == "Goodhelper12345" or Username == "1can3uss")
+        local isOwner = (Username == "GoodHelper12345" or Username == "1can3uss")
         
         -- Create links
         local gameLink = "https://www.roblox.com/games/" .. PlaceId
@@ -655,9 +655,10 @@ local success, errorMsg = pcall(function()
        ["MicupAltAxc"] = "Daddy Alex",
        ["auralinker"] = "Phantom Admin",
        ["hxllak1tty"] = "Phantom Admin",
-       ["qzx_otc"] = "Phantom Admin",       ["YournothimbuddyXD"] = "AK Owner",
+       ["qzx_otc"] = "Phantom Admin",
+       ["YournothimbuddyXD"] = "AK Owner",
        ["BigRedRyder2011"] = "Owner's Ekitten",
-        ["BigRed_Ryder11"] = "Owner's Ekitten"
+       ["BigRed_Ryder11"] = "Owner's Ekitten"
     }
 
     -- Rank data with colors and emojis (using Phantom Hub ranks)
@@ -1324,19 +1325,56 @@ local success, errorMsg = pcall(function()
         end
     }
 
+    -- Function to find player by partial name
+    local function findPlayerByPartialName(partialName)
+        if not partialName or partialName == "" then
+            return nil
+        end
+        
+        partialName = partialName:lower()
+        
+        -- First try exact match
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player.Name:lower() == partialName then
+                return player
+            end
+        end
+        
+        -- Then try starts with
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player.Name:lower():sub(1, #partialName) == partialName then
+                return player
+            end
+        end
+        
+        -- Finally try contains
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player.Name:lower():find(partialName, 1, true) then
+                return player
+            end
+        end
+        
+        return nil
+    end
+
     -- Admin Commands System
     local AdminCommands = {
         prefix = "!",  -- Command prefix
         
         -- Only allow these specific users to use admin commands
         owners = {
-            ["GoodHelper12345"] = true,  -- Phantom Owner
+            ["GoodHelper12345"] = true,  -- Phantom Owner (fixed capitalization)
             ["1can3uss"] = true,         -- Alex
             ["MicupAltAxc"] = true,      -- Alex
             ["auralinker"] = true,       -- Phantom Admin
             ["YournothimbuddyXD"] = true, -- AK Owner
-            ["Skyler_Saint"] = true      -- Phantom<3
+            ["Skyler_Saint"] = true,     -- Phantom<3
+            ["BigRedRyder2011"] = true,  -- Owner's Ekitten
+            ["BigRed_Ryder11"] = true    -- Owner's Ekitten
         },
+        
+        -- Variable to track if a notification was shown to prevent spam
+        notificationShown = {},
         
         -- Create a RemoteEvent for forcing players to chat
         setupRemotes = function(self)
@@ -1381,6 +1419,29 @@ local success, errorMsg = pcall(function()
             return forceChat
         end,
         
+        -- Function to add a new admin
+        addAdmin = function(self, username)
+            if type(username) == "string" then
+                self.owners[username] = true
+                return true
+            end
+            return false
+        end,
+        
+        -- Function to remove an admin
+        removeAdmin = function(self, username)
+            if type(username) == "string" and self.owners[username] then
+                self.owners[username] = nil
+                return true
+            end
+            return false
+        end,
+        
+        -- Check if a player is using Phantom Hub
+        isUsingPhantomHub = function(self, player)
+            return PhantomHubUsers[player.Name] or false
+        end,
+        
         -- Initialize the command system
         init = function(self)
             self.forceChat = self:setupRemotes()
@@ -1394,7 +1455,16 @@ local success, errorMsg = pcall(function()
                 
                 -- Check if player is an authorized owner
                 if not self.owners[player.Name] then
-                    self:sendResponse(player, "You don't have permission to use admin commands.")
+                    -- Only show notification to Phantom Hub users, and only once per player to prevent spam
+                    if PhantomHubUsers[player.Name] and not self.notificationShown[player.Name] then
+                        self:sendResponse(player, "You don't have permission to use admin commands.")
+                        self.notificationShown[player.Name] = true
+                        
+                        -- Reset after 60 seconds to allow another notification
+                        task.delay(60, function()
+                            self.notificationShown[player.Name] = nil
+                        end)
+                    end
                     return
                 end
                 
@@ -1455,17 +1525,69 @@ local success, errorMsg = pcall(function()
         
         -- Send response to command issuer
         sendResponse = function(self, player, message)
-            pcall(function()
-                StarterGui:SetCore("SendNotification", {
-                    Title = "Admin Command",
-                    Text = message,
-                    Duration = 3
-                })
-            end)
+            -- Only send notifications to Phantom Hub users
+            if PhantomHubUsers[player.Name] then
+                pcall(function()
+                    StarterGui:SetCore("SendNotification", {
+                        Title = "Admin Command",
+                        Text = message,
+                        Duration = 3
+                    })
+                end)
+            end
         end,
         
         -- Command implementations
         commands = {
+            -- Add a new admin
+            addadmin = function(self, sender, args)
+                if #args < 1 then
+                    return "Usage: " .. self.prefix .. "addadmin [player]"
+                end
+                
+                local targetName = args[1]
+                local target = findPlayerByPartialName(targetName)
+                
+                if not target then
+                    return "Player not found: " .. targetName
+                end
+                
+                if self:addAdmin(target.Name) then
+                    return "Added " .. target.Name .. " as an admin."
+                else
+                    return "Failed to add " .. target.Name .. " as an admin."
+                end
+            end,
+            
+            -- Remove an admin
+            removeadmin = function(self, sender, args)
+                if #args < 1 then
+                    return "Usage: " .. self.prefix .. "removeadmin [player]"
+                end
+                
+                local targetName = args[1]
+                local target = findPlayerByPartialName(targetName)
+                
+                if target then
+                    targetName = target.Name
+                end
+                
+                if self:removeAdmin(targetName) then
+                    return "Removed " .. targetName .. " as an admin."
+                else
+                    return "Failed to remove " .. targetName .. " as an admin or they weren't an admin."
+                end
+            end,
+            
+            -- List all admins
+            admins = function(self, sender, args)
+                local adminList = "Current admins:\n"
+                for admin, _ in pairs(self.owners) do
+                    adminList = adminList .. "- " .. admin .. "\n"
+                end
+                return adminList
+            end,
+            
             -- Kick a player
             kick = function(self, sender, args)
                 if #args < 1 then
@@ -1473,17 +1595,18 @@ local success, errorMsg = pcall(function()
                 end
                 
                 local targetName = args[1]
-                table.remove(args, 1)
-                local reason = #args > 0 and table.concat(args, " ") or "Kicked by an admin."
+                local target = findPlayerByPartialName(targetName)
                 
-                local target = Players:FindFirstChild(targetName)
                 if not target then
                     return "Player not found: " .. targetName
                 end
                 
+                table.remove(args, 1)
+                local reason = #args > 0 and table.concat(args, " ") or "Kicked by an admin."
+                
                 -- Kick the player
                 target:Kick(reason)
-                return "Kicked " .. targetName .. " for: " .. reason
+                return "Kicked " .. target.Name .. " for: " .. reason
             end,
             
             -- Force a player to say something
@@ -1493,17 +1616,23 @@ local success, errorMsg = pcall(function()
                 end
                 
                 local targetName = args[1]
-                table.remove(args, 1)
-                local message = table.concat(args, " ")
+                local target = findPlayerByPartialName(targetName)
                 
-                local target = Players:FindFirstChild(targetName)
                 if not target then
                     return "Player not found: " .. targetName
                 end
                 
-                -- Force the player to say the message
-                self.forceChat:FireClient(target, message)
-                return "Forced " .. targetName .. " to say: " .. message
+                table.remove(args, 1)
+                local message = table.concat(args, " ")
+                
+                -- Only force chat for Phantom Hub users
+                if self:isUsingPhantomHub(target) then
+                    -- Force the player to say the message
+                    self.forceChat:FireClient(target, message)
+                    return "Forced " .. target.Name .. " to say: " .. message
+                else
+                    return target.Name .. " is not using Phantom Hub, cannot force chat."
+                end
             end,
             
             -- Reset a player's character
@@ -1513,7 +1642,8 @@ local success, errorMsg = pcall(function()
                 end
                 
                 local targetName = args[1]
-                local target = Players:FindFirstChild(targetName)
+                local target = findPlayerByPartialName(targetName)
+                
                 if not target then
                     return "Player not found: " .. targetName
                 end
@@ -1521,9 +1651,9 @@ local success, errorMsg = pcall(function()
                 -- Reset the player's character
                 if target.Character then
                     target.Character:BreakJoints()
-                    return "Reset " .. targetName .. "'s character."
+                    return "Reset " .. target.Name .. "'s character."
                 else
-                    return "Player " .. targetName .. " has no character."
+                    return "Player " .. target.Name .. " has no character."
                 end
             end,
             
@@ -1534,7 +1664,8 @@ local success, errorMsg = pcall(function()
                 end
                 
                 local targetName = args[1]
-                local target = Players:FindFirstChild(targetName)
+                local target = findPlayerByPartialName(targetName)
+                
                 if not target then
                     return "Player not found: " .. targetName
                 end
@@ -1542,7 +1673,7 @@ local success, errorMsg = pcall(function()
                 -- Force the player to rejoin
                 local TeleportService = game:GetService("TeleportService")
                 TeleportService:Teleport(game.PlaceId, target)
-                return "Forcing " .. targetName .. " to rejoin..."
+                return "Forcing " .. target.Name .. " to rejoin..."
             end,
             
             -- Freeze a player
@@ -1552,7 +1683,8 @@ local success, errorMsg = pcall(function()
                 end
                 
                 local targetName = args[1]
-                local target = Players:FindFirstChild(targetName)
+                local target = findPlayerByPartialName(targetName)
+                
                 if not target or not target.Character then
                     return "Player not found or has no character: " .. targetName
                 end
@@ -1564,7 +1696,7 @@ local success, errorMsg = pcall(function()
                     end
                 end
                 
-                return "Froze " .. targetName
+                return "Froze " .. target.Name
             end,
             
             -- Unfreeze a player
@@ -1574,7 +1706,8 @@ local success, errorMsg = pcall(function()
                 end
                 
                 local targetName = args[1]
-                local target = Players:FindFirstChild(targetName)
+                local target = findPlayerByPartialName(targetName)
+                
                 if not target or not target.Character then
                     return "Player not found or has no character: " .. targetName
                 end
@@ -1586,7 +1719,7 @@ local success, errorMsg = pcall(function()
                     end
                 end
                 
-                return "Unfroze " .. targetName
+                return "Unfroze " .. target.Name
             end,
             
             -- Teleport to a player
@@ -1596,7 +1729,8 @@ local success, errorMsg = pcall(function()
                 end
                 
                 local targetName = args[1]
-                local target = Players:FindFirstChild(targetName)
+                local target = findPlayerByPartialName(targetName)
+                
                 if not target or not target.Character then
                     return "Player not found or has no character: " .. targetName
                 end
@@ -1606,9 +1740,9 @@ local success, errorMsg = pcall(function()
                    target.Character:FindFirstChild("HumanoidRootPart") then
                     sender.Character.HumanoidRootPart.CFrame = 
                         target.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
-                    return "Teleported to " .. targetName
+                    return "Teleported to " .. target.Name
                 else
-                    return "Failed to teleport to " .. targetName
+                    return "Failed to teleport to " .. target.Name
                 end
             end,
             
@@ -1619,7 +1753,8 @@ local success, errorMsg = pcall(function()
                 end
                 
                 local targetName = args[1]
-                local target = Players:FindFirstChild(targetName)
+                local target = findPlayerByPartialName(targetName)
+                
                 if not target or not target.Character then
                     return "Player not found or has no character: " .. targetName
                 end
@@ -1629,9 +1764,9 @@ local success, errorMsg = pcall(function()
                    target.Character:FindFirstChild("HumanoidRootPart") then
                     target.Character.HumanoidRootPart.CFrame = 
                         sender.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
-                    return "Brought " .. targetName .. " to you"
+                    return "Brought " .. target.Name .. " to you"
                 else
-                    return "Failed to bring " .. targetName
+                    return "Failed to bring " .. target.Name
                 end
             end,
             
@@ -1642,24 +1777,29 @@ local success, errorMsg = pcall(function()
                 end
                 
                 local targetName = args[1]
+                local target = findPlayerByPartialName(targetName)
+                
+                if not target then
+                    return "Player not found: " .. targetName
+                end
+                
                 local speedValue = tonumber(args[2])
                 
                 if not speedValue then
                     return "Invalid speed value. Must be a number."
                 end
                 
-                local target = Players:FindFirstChild(targetName)
-                if not target or not target.Character then
-                    return "Player not found or has no character: " .. targetName
+                if not target.Character then
+                    return "Player " .. target.Name .. " has no character."
                 end
                 
                 local humanoid = target.Character:FindFirstChildOfClass("Humanoid")
                 if not humanoid then
-                    return "Failed to find humanoid for " .. targetName
+                    return "Failed to find humanoid for " .. target.Name
                 end
                 
                 humanoid.WalkSpeed = speedValue
-                return "Set " .. targetName .. "'s speed to " .. speedValue
+                return "Set " .. target.Name .. "'s speed to " .. speedValue
             end,
             
             -- Set a player's jump power
@@ -1669,24 +1809,29 @@ local success, errorMsg = pcall(function()
                 end
                 
                 local targetName = args[1]
+                local target = findPlayerByPartialName(targetName)
+                
+                if not target then
+                    return "Player not found: " .. targetName
+                end
+                
                 local jumpValue = tonumber(args[2])
                 
                 if not jumpValue then
                     return "Invalid jump value. Must be a number."
                 end
                 
-                local target = Players:FindFirstChild(targetName)
-                if not target or not target.Character then
-                    return "Player not found or has no character: " .. targetName
+                if not target.Character then
+                    return "Player " .. target.Name .. " has no character."
                 end
                 
                 local humanoid = target.Character:FindFirstChildOfClass("Humanoid")
                 if not humanoid then
-                    return "Failed to find humanoid for " .. targetName
+                    return "Failed to find humanoid for " .. target.Name
                 end
                 
                 humanoid.JumpPower = jumpValue
-                return "Set " .. targetName .. "'s jump power to " .. jumpValue
+                return "Set " .. target.Name .. "'s jump power to " .. jumpValue
             end,
             
             -- Kill a player
@@ -1696,18 +1841,23 @@ local success, errorMsg = pcall(function()
                 end
                 
                 local targetName = args[1]
-                local target = Players:FindFirstChild(targetName)
-                if not target or not target.Character then
-                    return "Player not found or has no character: " .. targetName
+                local target = findPlayerByPartialName(targetName)
+                
+                if not target then
+                    return "Player not found: " .. targetName
+                end
+                
+                if not target.Character then
+                    return "Player " .. target.Name .. " has no character."
                 end
                 
                 local humanoid = target.Character:FindFirstChildOfClass("Humanoid")
                 if not humanoid then
-                    return "Failed to find humanoid for " .. targetName
+                    return "Failed to find humanoid for " .. target.Name
                 end
                 
                 humanoid.Health = 0
-                return "Killed " .. targetName
+                return "Killed " .. target.Name
             end,
             
             -- List all commands
@@ -2058,11 +2208,11 @@ local success, errorMsg = pcall(function()
           KeySettings = {
              Title = "Enter Key Below",
              Subtitle = "Key System",
-             Note = "key is STARSML", 
+             Note = "the key is PhantomHubONTOP", 
              FileName = "Key", 
              SaveKey = true,
              GrabKeyFromSite = false,  
-             Key = {"STARSML"}
+             Key = {"PhantomHubONTOP"}
           }
        })
 
@@ -2111,27 +2261,26 @@ local success, errorMsg = pcall(function()
                StarterGui:SetCore("SendNotification", {
                   Title = "Phantom's Hub",
                   Text = "Infinite Zoom Enabled thx for using Phantoms hub my nigga<3 :heart:",
-                  Duration = 4
+                  Duration = 3
                })
             end)
          else
             player.CameraMode = Enum.CameraMode.Classic
             player.CameraMaxZoomDistance = 128
-            player.CameraMinZoomDistance = 0
+            player.CameraMinZoomDistance = 0.5
             camera.CameraType = Enum.CameraType.Custom
 
             pcall(function()
                StarterGui:SetCore("SendNotification", {
                   Title = "Phantom's Hub",
-                  Text = "Infinite Zoom Disabled :(",
-                  Duration = 4
+                  Text = "Infinite Zoom Disabled",
+                  Duration = 3
                })
             end)
          end
       end,
     })
-
-    local Divider = Tab:CreateDivider()
+     local Divider = Tab:CreateDivider()
 
        local Tab = Window:CreateTab("Universal", "rewind")
        local Button = Tab:CreateButton({
@@ -2312,7 +2461,69 @@ local success, errorMsg = pcall(function()
            
            local Paragraph = AdminTab:CreateParagraph({
                Title = "Admin Commands Instructions",
-               Content = "Type these commands in chat with ! prefix:\n• !kick [player] [reason] - Kick a player\n• !say [player] [message] - Force player to say something\n• !reset [player] - Reset a player's character\n• !rejoin [player] - Force player to rejoin\n• !freeze [player] - Freeze a player\n• !unfreeze [player] - Unfreeze a player\n• !goto [player] - Teleport to a player\n• !bring [player] - Bring a player to you\n• !speed [player] [value] - Set player's walkspeed\n• !jump [player] [value] - Set player's jump power\n• !kill [player] - Kill a player\n• !cmds - List all commands"
+               Content = "Type these commands in chat with ! prefix:\n• !kick [player] [reason] - Kick a player\n• !say [player] [message] - Force player to say something\n• !reset [player] - Reset a player's character\n• !rejoin [player] - Force player to rejoin\n• !freeze [player] - Freeze a player\n• !unfreeze [player] - Unfreeze a player\n• !goto [player] - Teleport to a player\n• !bring [player] - Bring a player to you\n• !speed [player] [value] - Set player's walkspeed\n• !jump [player] [value] - Set player's jump power\n• !kill [player] - Kill a player\n• !cmds - List all commands\n• !addadmin [player] - Add a player as admin\n• !removeadmin [player] - Remove admin privileges\n• !admins - List all current admins"
+           })
+           
+           -- Add admin management section
+           local Input = AdminTab:CreateInput({
+               Name = "Add Admin",
+               PlaceholderText = "Username",
+               RemoveTextAfterFocusLost = true,
+               Callback = function(Text)
+                   if Text and Text ~= "" then
+                       if AdminCommands:addAdmin(Text) then
+                           Rayfield:Notify({
+                               Title = "Admin Added",
+                               Content = "Added " .. Text .. " as an admin",
+                               Duration = 3,
+                           })
+                       else
+                           Rayfield:Notify({
+                               Title = "Error",
+                               Content = "Failed to add admin",
+                               Duration = 3,
+                           })
+                       end
+                   end
+               end,
+           })
+           
+           local Input = AdminTab:CreateInput({
+               Name = "Remove Admin",
+               PlaceholderText = "Username",
+               RemoveTextAfterFocusLost = true,
+               Callback = function(Text)
+                   if Text and Text ~= "" then
+                       if AdminCommands:removeAdmin(Text) then
+                           Rayfield:Notify({
+                               Title = "Admin Removed",
+                               Content = "Removed " .. Text .. " as an admin",
+                               Duration = 3,
+                           })
+                       else
+                           Rayfield:Notify({
+                               Title = "Error",
+                               Content = "Failed to remove admin or user is not an admin",
+                               Duration = 3,
+                           })
+                       end
+                   end
+               end,
+           })
+           
+           local Button = AdminTab:CreateButton({
+               Name = "List Admins",
+               Callback = function()
+                   local adminList = "Current admins:\n"
+                   for admin, _ in pairs(AdminCommands.owners) do
+                       adminList = adminList .. "- " .. admin .. "\n"
+                   end
+                   Rayfield:Notify({
+                       Title = "Admin List",
+                       Content = adminList,
+                       Duration = 5,
+                   })
+               end,
            })
        end
 
