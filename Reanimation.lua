@@ -1,5 +1,5 @@
--- Poison Hub Animation System
--- UI by Poison Hub, Reanimation script by AK ADMIN
+-- Phantom Hub Premium Animation System
+-- UI by Phantom Hub, Reanimation script by AK ADMIN
 
 Players = game:GetService("Players")
 Workspace = game:GetService("Workspace")
@@ -656,380 +656,402 @@ local function playFakeAnimation(animationId)
         end
     end)
 end
--- End of Fake Animation Section
 
--- NEW: Function to update Keybind Button Text
-local function updateKeybindButtonText(animButtonData, animName)
-    local keybind = animationKeybinds[animName]
-    if keybind then
-        animButtonData.KeybindButton.Text = keybind.Name -- Display KeyCode Name
-    else
-        animButtonData.KeybindButton.Text = "Key"
-    end
-end
-
--- Function to create the separate Animation List GUI
-local function createAnimationListGui(animTextBox)
+-- Create the Phantom Hub Premium GUI
+local function createPhantomHubGui()
+    -- Load saved data
+    loadCustomAnimations()
+    loadFavorites()
+    loadKeybinds()
+    
+    -- Create the main ScreenGui
     local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "AnimationListGui"
+    screenGui.Name = "PhantomHubPremium"
     screenGui.ResetOnSpawn = false
     screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-
-    loadFavorites() -- Load favorites when GUI is created
-    loadKeybinds() -- Load keybinds when GUI is created
-
+    
+    -- Create the main frame
     local mainFrame = Instance.new("Frame")
     mainFrame.Name = "MainFrame"
-    mainFrame.Size = UDim2.new(0, 330, 0, 400)
-    mainFrame.Position = UDim2.new(0.75, -175, 0.5, -200)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30) -- Darker background
+    mainFrame.Size = UDim2.new(0, 300, 0, 400)
+    mainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
     mainFrame.BorderSizePixel = 0
     local uiCorner = Instance.new("UICorner")
-    uiCorner.CornerRadius = UDim.new(0, 10)
+    uiCorner.CornerRadius = UDim.new(0, 8)
     uiCorner.Parent = mainFrame
     mainFrame.Parent = screenGui
-
-    -- Add a subtle gradient to the main frame
-    local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(25, 25, 30)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 35, 40))
-    })
-    gradient.Rotation = 45
-    gradient.Parent = mainFrame
-
+    
+    -- Create title bar
     local titleBar = Instance.new("Frame")
     titleBar.Name = "TitleBar"
-    titleBar.Size = UDim2.new(1, 0, 0, 50)
-    titleBar.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
+    titleBar.Size = UDim2.new(1, 0, 0, 36)
+    titleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
     titleBar.BorderSizePixel = 0
     local titleCorner = Instance.new("UICorner")
-    titleCorner.CornerRadius = UDim.new(0, 10)
+    titleCorner.CornerRadius = UDim.new(0, 8)
     titleCorner.Parent = titleBar
+    
+    -- Fix the bottom corners of the title bar
+    local titleBottom = Instance.new("Frame")
+    titleBottom.Name = "TitleBottom"
+    titleBottom.Size = UDim2.new(1, 0, 0, 8)
+    titleBottom.Position = UDim2.new(0, 0, 1, -8)
+    titleBottom.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+    titleBottom.BorderSizePixel = 0
+    titleBottom.Parent = titleBar
+    
     titleBar.Parent = mainFrame
-
-    -- Add a subtle gradient to the title bar
-    local titleGradient = Instance.new("UIGradient")
-    titleGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(138, 43, 226)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(158, 63, 246))
-    })
-    titleGradient.Rotation = 45
-    titleGradient.Parent = titleBar
-
-    local titleLabel = Instance.new("TextLabel")
-    titleLabel.Name = "Title"
-    titleLabel.Size = UDim2.new(1, -50, 1, 0)
-    titleLabel.Position = UDim2.new(0, 25, 0, 0)
-    titleLabel.Text = "Poison Hub Animations"
-    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    titleLabel.TextSize = 18
-    titleLabel.Font = Enum.Font.GothamBold
-    titleLabel.BackgroundTransparency = 1
-    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    titleLabel.Parent = titleBar
-
-    -- Add Animation Button (+ button)
-    local addAnimButton = Instance.new("TextButton")
-    addAnimButton.Name = "AddAnimButton"
-    addAnimButton.Size = UDim2.new(0, 36, 0, 36)
-    addAnimButton.Position = UDim2.new(1, -80, 0, 7) -- Position it on the title bar
-    addAnimButton.Text = "+"
-    addAnimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    addAnimButton.TextSize = 24
-    addAnimButton.Font = Enum.Font.GothamBold
-    addAnimButton.BackgroundColor3 = Color3.fromRGB(60, 180, 75) -- Green color
-    addAnimButton.BackgroundTransparency = 0.3
-    addAnimButton.AutoButtonColor = true
-    local addAnimCorner = Instance.new("UICorner")
-    addAnimCorner.CornerRadius = UDim.new(1, 0) -- Circle
-    addAnimCorner.Parent = addAnimButton
-    addAnimButton.Parent = titleBar
-
-    -- Close Button
+    
+    -- Title text
+    local titleText = Instance.new("TextLabel")
+    titleText.Name = "TitleText"
+    titleText.Size = UDim2.new(1, -36, 1, 0)
+    titleText.Position = UDim2.new(0, 12, 0, 0)
+    titleText.Text = "Phantom Hub Premium"
+    titleText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleText.TextSize = 16
+    titleText.Font = Enum.Font.GothamBold
+    titleText.BackgroundTransparency = 1
+    titleText.TextXAlignment = Enum.TextXAlignment.Left
+    titleText.Parent = titleBar
+    
+    -- Close button
     local closeButton = Instance.new("TextButton")
     closeButton.Name = "CloseButton"
     closeButton.Size = UDim2.new(0, 36, 0, 36)
-    closeButton.Position = UDim2.new(1, -44, 0, 7)
-    closeButton.Text = "×" -- Using a multiplication symbol for a cleaner look
+    closeButton.Position = UDim2.new(1, -36, 0, 0)
+    closeButton.Text = "×"
     closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     closeButton.TextSize = 24
     closeButton.Font = Enum.Font.GothamBold
-    closeButton.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
-    closeButton.BackgroundTransparency = 0.3
-    closeButton.AutoButtonColor = true
-    local closeCorner = Instance.new("UICorner")
-    closeCorner.CornerRadius = UDim.new(0, 8)
-    closeCorner.Parent = closeButton
+    closeButton.BackgroundTransparency = 1
     closeButton.Parent = titleBar
-
-    closeButton.MouseButton1Click:Connect(function()
-        screenGui:Destroy()
-    end)
-
-    local contentFrame = Instance.new("Frame")
-    contentFrame.Name = "Content"
-    contentFrame.Size = UDim2.new(1, -20, 1, -60)
-    contentFrame.Position = UDim2.new(0, 10, 0, 55)
-    contentFrame.BackgroundTransparency = 1
-    contentFrame.Parent = mainFrame
-
-    -- Search TextBox with modern styling
-    local animSearchTextBox = Instance.new("TextBox")
-    animSearchTextBox.Name = "AnimSearchTextBox"
-    animSearchTextBox.Text = ""
-    animSearchTextBox.Size = UDim2.new(1, 0, 0, 36) -- Taller for better touch
-    animSearchTextBox.Position = UDim2.new(0, 0, 0, 0)
-    animSearchTextBox.PlaceholderText = "Search Animations..."
-    animSearchTextBox.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
-    animSearchTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    animSearchTextBox.PlaceholderColor3 = Color3.fromRGB(180, 180, 180)
-    animSearchTextBox.ClearTextOnFocus = false
-    animSearchTextBox.Font = Enum.Font.Gotham
-    animSearchTextBox.TextSize = 14
-    local animSearchTextBoxCorner = Instance.new("UICorner")
-    animSearchTextBoxCorner.CornerRadius = UDim.new(0, 8)
-    animSearchTextBoxCorner.Parent = animSearchTextBox
     
-    -- Add a search icon
+    -- Toggle button for reanimation
+    local toggleButton = Instance.new("TextButton")
+    toggleButton.Name = "ToggleButton"
+    toggleButton.Size = UDim2.new(1, -16, 0, 36)
+    toggleButton.Position = UDim2.new(0, 8, 0, 44)
+    toggleButton.Text = "Enable Reanimation"
+    toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    toggleButton.TextSize = 14
+    toggleButton.Font = Enum.Font.GothamBold
+    toggleButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    toggleButton.BorderSizePixel = 0
+    local toggleCorner = Instance.new("UICorner")
+    toggleCorner.CornerRadius = UDim.new(0, 6)
+    toggleCorner.Parent = toggleButton
+    toggleButton.Parent = mainFrame
+    
+    -- Search bar container
+    local searchContainer = Instance.new("Frame")
+    searchContainer.Name = "SearchContainer"
+    searchContainer.Size = UDim2.new(1, -16, 0, 36)
+    searchContainer.Position = UDim2.new(0, 8, 0, 88)
+    searchContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+    searchContainer.BorderSizePixel = 0
+    local searchCorner = Instance.new("UICorner")
+    searchCorner.CornerRadius = UDim.new(0, 6)
+    searchCorner.Parent = searchContainer
+    searchContainer.Parent = mainFrame
+    
+    -- Search icon
     local searchIcon = Instance.new("ImageLabel")
+    searchIcon.Name = "SearchIcon"
     searchIcon.Size = UDim2.new(0, 16, 0, 16)
-    searchIcon.Position = UDim2.new(0, 10, 0.5, -8)
+    searchIcon.Position = UDim2.new(0, 8, 0.5, -8)
     searchIcon.BackgroundTransparency = 1
     searchIcon.Image = "rbxassetid://3926305904" -- Roblox magnifying glass icon
     searchIcon.ImageRectOffset = Vector2.new(964, 324)
     searchIcon.ImageRectSize = Vector2.new(36, 36)
     searchIcon.ImageColor3 = Color3.fromRGB(180, 180, 180)
-    searchIcon.Parent = animSearchTextBox
+    searchIcon.Parent = searchContainer
     
-    -- Add padding for the search icon
-    animSearchTextBox.TextXAlignment = Enum.TextXAlignment.Left
-    animSearchTextBox.Text = "  "  -- Add space for the icon
-    animSearchTextBox.Parent = contentFrame
-
-    local animScrollFrame = Instance.new("ScrollingFrame")
-    animScrollFrame.Name = "AnimScrollFrame"
-    animScrollFrame.Size = UDim2.new(1, 0, 1, -46) -- Account for search box
-    animScrollFrame.Position = UDim2.new(0, 0, 0, 46)
-    animScrollFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
-    animScrollFrame.BorderSizePixel = 0
-    animScrollFrame.ScrollBarThickness = 4
-    animScrollFrame.ScrollBarImageColor3 = Color3.fromRGB(138, 43, 226) -- Purple scrollbar
-    animScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-    local scrollFrameCorner = Instance.new("UICorner")
-    scrollFrameCorner.CornerRadius = UDim.new(0, 8)
-    scrollFrameCorner.Parent = animScrollFrame
-    animScrollFrame.Parent = contentFrame
-
-    -- Create the popup for adding custom animations (initially hidden)
+    -- Search text box
+    local searchBox = Instance.new("TextBox")
+    searchBox.Name = "SearchBox"
+    searchBox.Size = UDim2.new(1, -80, 1, 0)
+    searchBox.Position = UDim2.new(0, 30, 0, 0)
+    searchBox.Text = ""
+    searchBox.PlaceholderText = "Search animations..."
+    searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    searchBox.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+    searchBox.TextSize = 14
+    searchBox.Font = Enum.Font.Gotham
+    searchBox.BackgroundTransparency = 1
+    searchBox.TextXAlignment = Enum.TextXAlignment.Left
+    searchBox.Parent = searchContainer
+    
+    -- Add button
+    local addButton = Instance.new("TextButton")
+    addButton.Name = "AddButton"
+    addButton.Size = UDim2.new(0, 50, 0, 28)
+    addButton.Position = UDim2.new(1, -50, 0.5, -14)
+    addButton.Text = "Add"
+    addButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    addButton.TextSize = 14
+    addButton.Font = Enum.Font.GothamBold
+    addButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    addButton.BorderSizePixel = 0
+    local addButtonCorner = Instance.new("UICorner")
+    addButtonCorner.CornerRadius = UDim.new(0, 4)
+    addButtonCorner.Parent = addButton
+    addButton.Parent = searchContainer
+    
+    -- Animation list container
+    local animListContainer = Instance.new("ScrollingFrame")
+    animListContainer.Name = "AnimListContainer"
+    animListContainer.Size = UDim2.new(1, -16, 1, -172) -- Adjusted for toggle button
+    animListContainer.Position = UDim2.new(0, 8, 0, 132) -- Adjusted for toggle button
+    animListContainer.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+    animListContainer.BorderSizePixel = 0
+    animListContainer.ScrollBarThickness = 4
+    animListContainer.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 110)
+    animListContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+    local listCorner = Instance.new("UICorner")
+    listCorner.CornerRadius = UDim.new(0, 6)
+    listCorner.Parent = animListContainer
+    animListContainer.Parent = mainFrame
+    
+    -- Speed control container
+    local speedContainer = Instance.new("Frame")
+    speedContainer.Name = "SpeedContainer"
+    speedContainer.Size = UDim2.new(1, -16, 0, 36)
+    speedContainer.Position = UDim2.new(0, 8, 1, -44)
+    speedContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+    speedContainer.BorderSizePixel = 0
+    local speedCorner = Instance.new("UICorner")
+    speedCorner.CornerRadius = UDim.new(0, 6)
+    speedCorner.Parent = speedContainer
+    speedContainer.Parent = mainFrame
+    
+    -- Speed label
+    local speedLabel = Instance.new("TextLabel")
+    speedLabel.Name = "SpeedLabel"
+    speedLabel.Size = UDim2.new(0, 50, 1, 0)
+    speedLabel.Position = UDim2.new(0, 8, 0, 0)
+    speedLabel.Text = "Speed:"
+    speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    speedLabel.TextSize = 14
+    speedLabel.Font = Enum.Font.Gotham
+    speedLabel.BackgroundTransparency = 1
+    speedLabel.TextXAlignment = Enum.TextXAlignment.Left
+    speedLabel.Parent = speedContainer
+    
+    -- Speed slider background
+    local sliderBG = Instance.new("Frame")
+    sliderBG.Name = "SliderBG"
+    sliderBG.Size = UDim2.new(0, 150, 0, 4)
+    sliderBG.Position = UDim2.new(0, 60, 0.5, -2)
+    sliderBG.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+    sliderBG.BorderSizePixel = 0
+    local sliderBGCorner = Instance.new("UICorner")
+    sliderBGCorner.CornerRadius = UDim.new(0, 2)
+    sliderBGCorner.Parent = sliderBG
+    sliderBG.Parent = speedContainer
+    
+    -- Speed slider fill
+    local sliderFill = Instance.new("Frame")
+    sliderFill.Name = "SliderFill"
+    sliderFill.Size = UDim2.new(0.5, 0, 1, 0)
+    sliderFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    sliderFill.BorderSizePixel = 0
+    local sliderFillCorner = Instance.new("UICorner")
+    sliderFillCorner.CornerRadius = UDim.new(0, 2)
+    sliderFillCorner.Parent = sliderFill
+    sliderFill.Parent = sliderBG
+    
+    -- Speed slider knob
+    local sliderKnob = Instance.new("Frame")
+    sliderKnob.Name = "SliderKnob"
+    sliderKnob.Size = UDim2.new(0, 12, 0, 12)
+    sliderKnob.Position = UDim2.new(0.5, -6, 0.5, -6)
+    sliderKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    sliderKnob.BorderSizePixel = 0
+    local knobCorner = Instance.new("UICorner")
+    knobCorner.CornerRadius = UDim.new(1, 0)
+    knobCorner.Parent = sliderKnob
+    sliderKnob.Parent = sliderFill
+    
+    -- Speed value label
+    local speedValue = Instance.new("TextLabel")
+    speedValue.Name = "SpeedValue"
+    speedValue.Size = UDim2.new(0, 40, 1, 0)
+    speedValue.Position = UDim2.new(1, -48, 0, 0)
+    speedValue.Text = "100"
+    speedValue.TextColor3 = Color3.fromRGB(255, 255, 255)
+    speedValue.TextSize = 14
+    speedValue.Font = Enum.Font.GothamBold
+    speedValue.BackgroundTransparency = 1
+    speedValue.TextXAlignment = Enum.TextXAlignment.Right
+    speedValue.Parent = speedContainer
+    
+    -- Add Animation Popup
     local addAnimPopup = Instance.new("Frame")
     addAnimPopup.Name = "AddAnimPopup"
-    addAnimPopup.Size = UDim2.new(0, 300, 0, 200)
-    addAnimPopup.Position = UDim2.new(0.5, -150, 0.5, -100)
-    addAnimPopup.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+    addAnimPopup.Size = UDim2.new(0, 280, 0, 180)
+    addAnimPopup.Position = UDim2.new(0.5, -140, 0.5, -90)
+    addAnimPopup.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
     addAnimPopup.BorderSizePixel = 0
     addAnimPopup.Visible = false
     addAnimPopup.ZIndex = 10
     local popupCorner = Instance.new("UICorner")
-    popupCorner.CornerRadius = UDim.new(0, 10)
+    popupCorner.CornerRadius = UDim.new(0, 8)
     popupCorner.Parent = addAnimPopup
-    
-    -- Add a shadow to the popup
-    local popupShadow = Instance.new("ImageLabel")
-    popupShadow.Name = "Shadow"
-    popupShadow.AnchorPoint = Vector2.new(0.5, 0.5)
-    popupShadow.BackgroundTransparency = 1
-    popupShadow.Position = UDim2.new(0.5, 0, 0.5, 4)
-    popupShadow.Size = UDim2.new(1, 12, 1, 12)
-    popupShadow.ZIndex = 9
-    popupShadow.Image = "rbxassetid://6014261993"
-    popupShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-    popupShadow.ImageTransparency = 0.6
-    popupShadow.ScaleType = Enum.ScaleType.Slice
-    popupShadow.SliceCenter = Rect.new(49, 49, 450, 450)
-    popupShadow.Parent = addAnimPopup
+    addAnimPopup.Parent = screenGui
     
     -- Popup title
     local popupTitle = Instance.new("TextLabel")
-    popupTitle.Name = "Title"
-    popupTitle.Size = UDim2.new(1, 0, 0, 40)
-    popupTitle.Text = "Add Custom Animation"
+    popupTitle.Name = "PopupTitle"
+    popupTitle.Size = UDim2.new(1, 0, 0, 36)
+    popupTitle.Text = "Add Animation"
     popupTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-    popupTitle.TextSize = 18
+    popupTitle.TextSize = 16
     popupTitle.Font = Enum.Font.GothamBold
-    popupTitle.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
+    popupTitle.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
     popupTitle.BorderSizePixel = 0
     popupTitle.ZIndex = 10
-    local titleCorner = Instance.new("UICorner")
-    titleCorner.CornerRadius = UDim.new(0, 10)
-    titleCorner.Parent = popupTitle
+    local popupTitleCorner = Instance.new("UICorner")
+    popupTitleCorner.CornerRadius = UDim.new(0, 8)
+    popupTitleCorner.Parent = popupTitle
     
-    -- Fix the bottom corners of the title
-    local titleBottom = Instance.new("Frame")
-    titleBottom.Name = "TitleBottom"
-    titleBottom.Size = UDim2.new(1, 0, 0, 10)
-    titleBottom.Position = UDim2.new(0, 0, 1, -10)
-    titleBottom.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
-    titleBottom.BorderSizePixel = 0
-    titleBottom.ZIndex = 10
-    titleBottom.Parent = popupTitle
+    -- Fix the bottom corners of the popup title
+    local popupTitleBottom = Instance.new("Frame")
+    popupTitleBottom.Name = "TitleBottom"
+    popupTitleBottom.Size = UDim2.new(1, 0, 0, 8)
+    popupTitleBottom.Position = UDim2.new(0, 0, 1, -8)
+    popupTitleBottom.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+    popupTitleBottom.BorderSizePixel = 0
+    popupTitleBottom.ZIndex = 10
+    popupTitleBottom.Parent = popupTitle
     
     popupTitle.Parent = addAnimPopup
     
-    -- Animation name input
+    -- Name label
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Name = "NameLabel"
-    nameLabel.Size = UDim2.new(1, -40, 0, 20)
-    nameLabel.Position = UDim2.new(0, 20, 0, 50)
-    nameLabel.Text = "Animation Name:"
+    nameLabel.Size = UDim2.new(0, 40, 0, 20)
+    nameLabel.Position = UDim2.new(0, 16, 0, 50)
+    nameLabel.Text = "Name"
     nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     nameLabel.TextSize = 14
-    nameLabel.Font = Enum.Font.GothamSemibold
+    nameLabel.Font = Enum.Font.Gotham
     nameLabel.BackgroundTransparency = 1
     nameLabel.TextXAlignment = Enum.TextXAlignment.Left
     nameLabel.ZIndex = 10
     nameLabel.Parent = addAnimPopup
     
+    -- Name input
     local nameInput = Instance.new("TextBox")
     nameInput.Name = "NameInput"
-    nameInput.Size = UDim2.new(1, -40, 0, 36)
-    nameInput.Position = UDim2.new(0, 20, 0, 70)
-    nameInput.PlaceholderText = "Enter animation name"
+    nameInput.Size = UDim2.new(1, -32, 0, 36)
+    nameInput.Position = UDim2.new(0, 16, 0, 70)
+    nameInput.PlaceholderText = "Enter name..."
     nameInput.Text = ""
     nameInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-    nameInput.PlaceholderColor3 = Color3.fromRGB(180, 180, 180)
-    nameInput.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+    nameInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+    nameInput.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
     nameInput.BorderSizePixel = 0
     nameInput.ZIndex = 10
+    nameInput.Font = Enum.Font.Gotham
+    nameInput.TextSize = 14
     local nameInputCorner = Instance.new("UICorner")
-    nameInputCorner.CornerRadius = UDim.new(0, 6)
+    nameInputCorner.CornerRadius = UDim.new(0, 4)
     nameInputCorner.Parent = nameInput
     nameInput.Parent = addAnimPopup
     
-    -- Animation ID input
+    -- ID label
     local idLabel = Instance.new("TextLabel")
     idLabel.Name = "IDLabel"
-    idLabel.Size = UDim2.new(1, -40, 0, 20)
-    idLabel.Position = UDim2.new(0, 20, 0, 116)
-    idLabel.Text = "Animation ID:"
+    idLabel.Size = UDim2.new(0, 40, 0, 20)
+    idLabel.Position = UDim2.new(0, 16, 0, 110)
+    idLabel.Text = "ID"
     idLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     idLabel.TextSize = 14
-    idLabel.Font = Enum.Font.GothamSemibold
+    idLabel.Font = Enum.Font.Gotham
     idLabel.BackgroundTransparency = 1
     idLabel.TextXAlignment = Enum.TextXAlignment.Left
     idLabel.ZIndex = 10
     idLabel.Parent = addAnimPopup
     
+    -- ID input
     local idInput = Instance.new("TextBox")
     idInput.Name = "IDInput"
-    idInput.Size = UDim2.new(1, -40, 0, 36)
-    idInput.Position = UDim2.new(0, 20, 0, 136)
-    idInput.PlaceholderText = "Enter animation ID"
+    idInput.Size = UDim2.new(1, -32, 0, 36)
+    idInput.Position = UDim2.new(0, 16, 0, 130)
+    idInput.PlaceholderText = "Enter id..."
     idInput.Text = ""
     idInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-    idInput.PlaceholderColor3 = Color3.fromRGB(180, 180, 180)
-    idInput.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+    idInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+    idInput.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
     idInput.BorderSizePixel = 0
     idInput.ZIndex = 10
+    idInput.Font = Enum.Font.Gotham
+    idInput.TextSize = 14
     local idInputCorner = Instance.new("UICorner")
-    idInputCorner.CornerRadius = UDim.new(0, 6)
+    idInputCorner.CornerRadius = UDim.new(0, 4)
     idInputCorner.Parent = idInput
     idInput.Parent = addAnimPopup
     
-    -- Buttons
-    local saveButton = Instance.new("TextButton")
-    saveButton.Name = "SaveButton"
-    saveButton.Size = UDim2.new(0.5, -25, 0, 36)
-    saveButton.Position = UDim2.new(0, 20, 1, -46)
-    saveButton.Text = "Save"
-    saveButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    saveButton.TextSize = 16
-    saveButton.Font = Enum.Font.GothamSemibold
-    saveButton.BackgroundColor3 = Color3.fromRGB(60, 180, 75) -- Green
-    saveButton.BorderSizePixel = 0
-    saveButton.ZIndex = 10
-    local saveButtonCorner = Instance.new("UICorner")
-    saveButtonCorner.CornerRadius = UDim.new(0, 6)
-    saveButtonCorner.Parent = saveButton
-    saveButton.Parent = addAnimPopup
-    
+    -- Cancel button
     local cancelButton = Instance.new("TextButton")
     cancelButton.Name = "CancelButton"
-    cancelButton.Size = UDim2.new(0.5, -25, 0, 36)
-    cancelButton.Position = UDim2.new(0.5, 5, 1, -46)
+    cancelButton.Size = UDim2.new(0, 80, 0, 36)
+    cancelButton.Position = UDim2.new(0, 16, 1, -46)
     cancelButton.Text = "Cancel"
     cancelButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    cancelButton.TextSize = 16
-    cancelButton.Font = Enum.Font.GothamSemibold
-    cancelButton.BackgroundColor3 = Color3.fromRGB(211, 47, 47) -- Red
+    cancelButton.TextSize = 14
+    cancelButton.Font = Enum.Font.GothamBold
+    cancelButton.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
     cancelButton.BorderSizePixel = 0
     cancelButton.ZIndex = 10
     local cancelButtonCorner = Instance.new("UICorner")
-    cancelButtonCorner.CornerRadius = UDim.new(0, 6)
+    cancelButtonCorner.CornerRadius = UDim.new(0, 4)
     cancelButtonCorner.Parent = cancelButton
     cancelButton.Parent = addAnimPopup
     
-    addAnimPopup.Parent = screenGui
-
+    -- Add button for popup
+    local popupAddButton = Instance.new("TextButton")
+    popupAddButton.Name = "AddButton"
+    popupAddButton.Size = UDim2.new(0, 80, 0, 36)
+    popupAddButton.Position = UDim2.new(1, -96, 1, -46)
+    popupAddButton.Text = "Add"
+    popupAddButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    popupAddButton.TextSize = 14
+    popupAddButton.Font = Enum.Font.GothamBold
+    popupAddButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    popupAddButton.BorderSizePixel = 0
+    popupAddButton.ZIndex = 10
+    local popupAddButtonCorner = Instance.new("UICorner")
+    popupAddButtonCorner.CornerRadius = UDim.new(0, 4)
+    popupAddButtonCorner.Parent = popupAddButton
+    popupAddButton.Parent = addAnimPopup
+    
     -- Table to store animation buttons for search functionality
     local animationButtons = {}
-    local keybindInputActive = false
-    local currentAnimationForKeybind = nil
-
-    -- Function to update animation button visibility based on search text and favorites
+    
+    -- Function to update animation button visibility based on search text
     local function updateAnimationButtonsVisibility(searchText)
-        local yOffset = 10 -- Start with padding
+        local yOffset = 5
         local visibleButtonCount = 0
-
-        -- Sort animations: Favorites first, then alphabetically
-        local sortedAnimationNames = {}
-        local favoriteNames = {}
-        local nonFavoriteNames = {}
-
-        for animName in pairs(BuiltInAnimationsR15) do
-            if favoriteAnimations[animName] then
-                table.insert(favoriteNames, animName)
-            else
-                table.insert(nonFavoriteNames, animName)
-            end
-        end
-        table.sort(favoriteNames)
-        table.sort(nonFavoriteNames)
-        for _, name in ipairs(favoriteNames) do
-            table.insert(sortedAnimationNames, name)
-        end
-        for _, name in ipairs(nonFavoriteNames) do
-            table.insert(sortedAnimationNames, name)
-        end
-
-        for _, animName in ipairs(sortedAnimationNames) do -- Iterate through sorted names
-            local animButtonData = animationButtons[animName]
-            if not animButtonData then continue end -- Safety check
-
+        
+        for animName, animButtonData in pairs(animationButtons) do
             if string.find(string.lower(animName), string.lower(searchText)) then
                 animButtonData.Container.Visible = true
                 animButtonData.Container.Position = UDim2.new(0, 5, 0, yOffset)
-                yOffset = yOffset + 70 -- Increased spacing for modern look
+                yOffset = yOffset + 45
                 visibleButtonCount = visibleButtonCount + 1
-
-                -- Highlight favorite animations visually
-                if favoriteAnimations[animName] then
-                    animButtonData.NameButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- Purple for favorites
-                    animButtonData.Container.BackgroundColor3 = Color3.fromRGB(45, 35, 55) -- Slightly purple tinted background
-                else
-                    animButtonData.NameButton.BackgroundColor3 = Color3.fromRGB(60, 60, 70)
-                    animButtonData.Container.BackgroundColor3 = Color3.fromRGB(40, 40, 45) -- Neutral dark background
-                end
-                updateKeybindButtonText(animButtonData, animName) -- Update Keybind Button Text
             else
                 animButtonData.Container.Visible = false
             end
         end
-        animScrollFrame.CanvasSize = UDim2.new(0, 0, 0, math.max(0, yOffset + 10)) -- Add padding at bottom
+        
+        animListContainer.CanvasSize = UDim2.new(0, 0, 0, math.max(0, yOffset))
     end
-
-    -- Function to refresh the animation list after adding a new animation
+    
+    -- Function to refresh the animation list
     local function refreshAnimationList()
         -- Clear existing buttons
         for _, animButtonData in pairs(animationButtons) do
@@ -1041,451 +1063,238 @@ local function createAnimationListGui(animTextBox)
         end
         animationButtons = {}
         
-        -- Recreate buttons for all animations (including custom ones)
+        -- Recreate buttons for all animations
+        local yOffset = 5
         for animName, animId in pairs(BuiltInAnimationsR15) do
             -- Create a container for each animation entry
             local animContainer = Instance.new("Frame")
             animContainer.Name = animName .. "Container"
-            animContainer.Size = UDim2.new(1, -10, 0, 60) -- Taller container for modern look
-            animContainer.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+            animContainer.Size = UDim2.new(1, -10, 0, 40)
+            animContainer.Position = UDim2.new(0, 5, 0, yOffset)
+            animContainer.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
             animContainer.BorderSizePixel = 0
             local containerCorner = Instance.new("UICorner")
-            containerCorner.CornerRadius = UDim.new(0, 8)
+            containerCorner.CornerRadius = UDim.new(0, 6)
             containerCorner.Parent = animContainer
-            animContainer.Parent = animScrollFrame
+            animContainer.Parent = animListContainer
             
-            -- Add subtle shadow effect
-            local shadow = Instance.new("ImageLabel")
-            shadow.Name = "Shadow"
-            shadow.AnchorPoint = Vector2.new(0.5, 0.5)
-            shadow.BackgroundTransparency = 1
-            shadow.Position = UDim2.new(0.5, 0, 0.5, 2) -- Offset slightly
-            shadow.Size = UDim2.new(1, 6, 1, 6)
-            shadow.ZIndex = 0
-            shadow.Image = "rbxassetid://6014261993" -- Soft shadow image
-            shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-            shadow.ImageTransparency = 0.7
-            shadow.ScaleType = Enum.ScaleType.Slice
-            shadow.SliceCenter = Rect.new(49, 49, 450, 450)
-            shadow.Parent = animContainer
-
-            local animNameButton = Instance.new("TextButton")
-            animNameButton.Name = animName .. "NameButton"
-            animNameButton.Size = UDim2.new(1, -140, 0, 30) -- Wider button for title
-            animNameButton.Position = UDim2.new(0, 10, 0, 5) -- Positioned inside container
-            animNameButton.Text = animName
-            animNameButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-            animNameButton.TextSize = 14
-            animNameButton.Font = Enum.Font.GothamSemibold
-            animNameButton.BackgroundColor3 = Color3.fromRGB(60, 60, 70)
-            animNameButton.BorderSizePixel = 0
-            animNameButton.TextXAlignment = Enum.TextXAlignment.Center
-            local buttonCorner = Instance.new("UICorner")
-            buttonCorner.CornerRadius = UDim.new(0, 6)
-            buttonCorner.Parent = animNameButton
-            animNameButton.Parent = animContainer
-
-            -- When clicked, set the animation ID in the textbox of the main GUI
-            animNameButton.MouseButton1Click:Connect(function()
-                animTextBox.Text = tostring(animId)
-            end)
-
-            -- Play Animation Button
-            local playAnimButton = Instance.new("TextButton")
-            playAnimButton.Name = animName .. "PlayButton"
-            playAnimButton.Size = UDim2.new(0.5, -15, 0, 30) -- Half width minus padding
-            playAnimButton.Position = UDim2.new(0, 10, 0, 40) -- Below name button
-            playAnimButton.Text = "Play"
-            playAnimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-            playAnimButton.TextSize = 14
-            playAnimButton.Font = Enum.Font.GothamMedium
-            playAnimButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- Purple
-            playAnimButton.BorderSizePixel = 0
+            -- Animation name label
+            local animNameLabel = Instance.new("TextLabel")
+            animNameLabel.Name = animName .. "Label"
+            animNameLabel.Size = UDim2.new(1, -100, 1, 0)
+            animNameLabel.Position = UDim2.new(0, 10, 0, 0)
+            animNameLabel.Text = animName
+            animNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            animNameLabel.TextSize = 14
+            animNameLabel.Font = Enum.Font.Gotham
+            animNameLabel.BackgroundTransparency = 1
+            animNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+            animNameLabel.TextTruncate = Enum.TextTruncate.AtEnd
+            animNameLabel.Parent = animContainer
+            
+            -- Play button
+            local playButton = Instance.new("TextButton")
+            playButton.Name = animName .. "PlayButton"
+            playButton.Size = UDim2.new(0, 80, 0, 30)
+            playButton.Position = UDim2.new(1, -90, 0.5, -15)
+            playButton.Text = "Play"
+            playButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            playButton.TextSize = 14
+            playButton.Font = Enum.Font.GothamBold
+            playButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+            playButton.BorderSizePixel = 0
             local playButtonCorner = Instance.new("UICorner")
-            playButtonCorner.CornerRadius = UDim.new(0, 6)
-            playButtonCorner.Parent = playAnimButton
-            playAnimButton.Parent = animContainer
-
-            playAnimButton.MouseButton1Click:Connect(function()
-                playFakeAnimation(tostring(animId)) -- Call playFakeAnimation with the ID
-            end)
-
-            -- Stop Animation Button
-            local stopAnimButton = Instance.new("TextButton")
-            stopAnimButton.Name = animName .. "StopButton"
-            stopAnimButton.Size = UDim2.new(0.5, -15, 0, 30) -- Half width minus padding
-            stopAnimButton.Position = UDim2.new(0.5, 5, 0, 40) -- Right of play button
-            stopAnimButton.Text = "Stop"
-            stopAnimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-            stopAnimButton.TextSize = 14
-            stopAnimButton.Font = Enum.Font.GothamMedium
-            stopAnimButton.BackgroundColor3 = Color3.fromRGB(211, 47, 47) -- Red
-            stopAnimButton.BorderSizePixel = 0
-            local stopButtonCorner = Instance.new("UICorner")
-            stopButtonCorner.CornerRadius = UDim.new(0, 6)
-            stopButtonCorner.Parent = stopAnimButton
-            stopAnimButton.Parent = animContainer
-
-            stopAnimButton.MouseButton1Click:Connect(function()
-                stopFakeAnimation() -- Call stopFakeAnimation function
-            end)
-
-            -- Favorite Animation Button
-            local favoriteAnimButton = Instance.new("TextButton")
-            favoriteAnimButton.Name = animName .. "FavoriteButton"
-            favoriteAnimButton.Size = UDim2.new(0, 36, 0, 36)
-            favoriteAnimButton.Position = UDim2.new(1, -130, 0, 12) -- Right side of container
-            favoriteAnimButton.Text = favoriteAnimations[animName] and "★" or "☆" -- Filled star if favorite, otherwise empty
-            favoriteAnimButton.TextColor3 = Color3.fromRGB(255, 215, 0) -- Gold color
-            favoriteAnimButton.TextSize = 24
-            favoriteAnimButton.Font = Enum.Font.GothamBold
-            favoriteAnimButton.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
-            favoriteAnimButton.BorderSizePixel = 0
-            local favoriteButtonCorner = Instance.new("UICorner")
-            favoriteButtonCorner.CornerRadius = UDim.new(1, 0) -- Circle
-            favoriteButtonCorner.Parent = favoriteAnimButton
-            favoriteAnimButton.Parent = animContainer
-
-            favoriteAnimButton.MouseButton1Click:Connect(function()
-                if favoriteAnimations[animName] then
-                    favoriteAnimations[animName] = nil -- Remove from favorites
-                else
-                    favoriteAnimations[animName] = true -- Add to favorites
+            playButtonCorner.CornerRadius = UDim.new(0, 4)
+            playButtonCorner.Parent = playButton
+            playButton.Parent = animContainer
+            
+            -- Play button click handler
+            playButton.MouseButton1Click:Connect(function()
+                if not ghostEnabled then
+                    -- Show notification that reanimation needs to be enabled
+                    local notification = Instance.new("TextLabel")
+                    notification.Text = "Enable reanimation first!"
+                    notification.Size = UDim2.new(0, 200, 0, 40)
+                    notification.Position = UDim2.new(0.5, -100, 0, 10)
+                    notification.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+                    notification.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    notification.TextSize = 14
+                    notification.Font = Enum.Font.GothamBold
+                    notification.Parent = screenGui
+                    local notifCorner = Instance.new("UICorner")
+                    notifCorner.CornerRadius = UDim.new(0, 6)
+                    notifCorner.Parent = notification
+                    
+                    game:GetService("Debris"):AddItem(notification, 2)
+                    return
                 end
-                favoriteAnimButton.Text = favoriteAnimations[animName] and "★" or "☆" -- Update button text
-                updateAnimationButtonsVisibility(animSearchTextBox.Text) -- Refresh list to re-sort
-                saveFavorites() -- Save favorites after change
-            end)
-
-            -- NEW: Keybind Animation Button
-            local keybindAnimButton = Instance.new("TextButton")
-            keybindAnimButton.Name = animName .. "KeybindButton"
-            keybindAnimButton.Size = UDim2.new(0, 36, 0, 36)
-            keybindAnimButton.Position = UDim2.new(1, -80, 0, 12) -- Right of favorite button
-            keybindAnimButton.Text = "Key" -- Initial text
-            keybindAnimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-            keybindAnimButton.TextSize = 12
-            keybindAnimButton.Font = Enum.Font.GothamMedium
-            keybindAnimButton.BackgroundColor3 = Color3.fromRGB(70, 70, 80)
-            keybindAnimButton.BorderSizePixel = 0
-            local keybindButtonCorner = Instance.new("UICorner")
-            keybindButtonCorner.CornerRadius = UDim.new(1, 0) -- Circle
-            keybindButtonCorner.Parent = keybindAnimButton
-            keybindAnimButton.Parent = animContainer
-
-            keybindAnimButton.MouseButton1Click:Connect(function()
-                if keybindInputActive then return end -- Prevent overlapping keybind inputs
-                keybindInputActive = true
-                currentAnimationForKeybind = animName
-                keybindAnimButton.Text = "..." -- Prompt user to press a key
-                keybindAnimButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- Highlight with purple
-
-                local function inputBeganHandler(input, gameProcessedEvent)
-                    if not keybindInputActive or currentAnimationForKeybind ~= animName then return end
-                    if input.UserInputType == Enum.UserInputType.Keyboard then
-                        animationKeybinds[animName] = input.KeyCode
-                        saveKeybinds()
-                        updateKeybindButtonText(animationButtons[animName], animName)
-                        keybindInputActive = false
-                        currentAnimationForKeybind = nil
-                        keybindAnimButton.BackgroundColor3 = Color3.fromRGB(70, 70, 80) -- Reset color
-                        UserInputService.InputBegan:Disconnect(inputBeganHandler) -- Disconnect after setting keybind
-                    elseif input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                        -- Allow canceling keybind setting by clicking away
-                        updateKeybindButtonText(animationButtons[animName], animName) -- Revert text
-                        keybindInputActive = false
-                        currentAnimationForKeybind = nil
-                        keybindAnimButton.BackgroundColor3 = Color3.fromRGB(70, 70, 80) -- Reset color
-                        UserInputService.InputBegan:Disconnect(inputBeganHandler)
+                
+                playFakeAnimation(tostring(animId))
+                
+                -- Update all play buttons to show "Stop" for this animation
+                for otherName, otherButtonData in pairs(animationButtons) do
+                    if otherName == animName then
+                        otherButtonData.PlayButton.Text = "Stop"
+                    else
+                        otherButtonData.PlayButton.Text = "Play"
                     end
                 end
-
-                UserInputService.InputBegan:Connect(inputBeganHandler)
             end)
-
-            -- Add a delete button for custom animations
-            if customAnimations[animName] then
-                local deleteAnimButton = Instance.new("TextButton")
-                deleteAnimButton.Name = animName .. "DeleteButton"
-                deleteAnimButton.Size = UDim2.new(0, 36, 0, 36)
-                deleteAnimButton.Position = UDim2.new(1, -40, 0, 12) -- Right of keybind button
-                deleteAnimButton.Text = "×" -- X symbol
-                deleteAnimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-                deleteAnimButton.TextSize = 24
-                deleteAnimButton.Font = Enum.Font.GothamBold
-                deleteAnimButton.BackgroundColor3 = Color3.fromRGB(211, 47, 47) -- Red
-                deleteAnimButton.BorderSizePixel = 0
-                local deleteButtonCorner = Instance.new("UICorner")
-                deleteButtonCorner.CornerRadius = UDim.new(1, 0) -- Circle
-                deleteButtonCorner.Parent = deleteAnimButton
-                deleteAnimButton.Parent = animContainer
-                
-                deleteAnimButton.MouseButton1Click:Connect(function()
-                    -- Remove from custom animations
-                    customAnimations[animName] = nil
-                    -- Remove from built-in animations
-                    BuiltInAnimationsR15[animName] = nil
-                    -- Save changes
-                    saveCustomAnimations()
-                    -- Refresh the list
-                    refreshAnimationList()
-                    updateAnimationButtonsVisibility(animSearchTextBox.Text)
-                end)
+            
+            -- Keybind button
+            local keybindButton = Instance.new("TextButton")
+            keybindButton.Name = animName .. "KeybindButton"
+            keybindButton.Size = UDim2.new(0, 30, 0, 30)
+            keybindButton.Position = UDim2.new(1, -130, 0.5, -15)
+            keybindButton.Text = "⌨"
+            keybindButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            keybindButton.TextSize = 14
+            keybindButton.Font = Enum.Font.GothamBold
+            keybindButton.BackgroundColor3 = Color3.fromRGB(60, 60, 70)
+            keybindButton.BorderSizePixel = 0
+            local keybindButtonCorner = Instance.new("UICorner")
+            keybindButtonCorner.CornerRadius = UDim.new(0, 4)
+            keybindButtonCorner.Parent = keybindButton
+            keybindButton.Parent = animContainer
+            
+            -- Keybind button tooltip
+            local keybindTooltip = Instance.new("TextLabel")
+            keybindTooltip.Name = "KeybindTooltip"
+            keybindTooltip.Size = UDim2.new(0, 100, 0, 30)
+            keybindTooltip.Position = UDim2.new(0, -110, 0, 0)
+            keybindTooltip.Text = "Set keybind"
+            keybindTooltip.TextColor3 = Color3.fromRGB(255, 255, 255)
+            keybindTooltip.TextSize = 12
+            keybindTooltip.Font = Enum.Font.Gotham
+            keybindTooltip.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+            keybindTooltip.BorderSizePixel = 0
+            keybindTooltip.Visible = false
+            keybindTooltip.ZIndex = 10
+            local tooltipCorner = Instance.new("UICorner")
+            tooltipCorner.CornerRadius = UDim.new(0, 4)
+            tooltipCorner.Parent = keybindTooltip
+            keybindTooltip.Parent = keybindButton
+            
+            -- Show tooltip on hover
+            keybindButton.MouseEnter:Connect(function()
+                keybindTooltip.Visible = true
+            end)
+            
+            keybindButton.MouseLeave:Connect(function()
+                keybindTooltip.Visible = false
+            end)
+            
+            -- Update keybind button text if a keybind exists
+            if animationKeybinds[animName] then
+                keybindTooltip.Text = "Keybind: " .. animationKeybinds[animName].Name
             end
-
+            
+            -- Keybind button click handler
+            local isSettingKeybind = false
+            keybindButton.MouseButton1Click:Connect(function()
+                if isSettingKeybind then return end
+                
+                isSettingKeybind = true
+                keybindButton.Text = "..."
+                keybindButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+                
+                local connection
+                connection = UserInputService.InputBegan:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.Keyboard then
+                        animationKeybinds[animName] = input.KeyCode
+                        keybindButton.Text = "⌨"
+                        keybindButton.BackgroundColor3 = Color3.fromRGB(60, 60, 70)
+                        keybindTooltip.Text = "Keybind: " .. input.KeyCode.Name
+                        isSettingKeybind = false
+                        saveKeybinds()
+                        connection:Disconnect()
+                    end
+                end)
+            end)
+            
             animationButtons[animName] = {
                 Container = animContainer,
-                NameButton = animNameButton,
-                PlayButton = playAnimButton,
-                StopButton = stopAnimButton,
-                FavoriteButton = favoriteAnimButton,
-                KeybindButton = keybindAnimButton
+                NameLabel = animNameLabel,
+                PlayButton = playButton,
+                KeybindButton = keybindButton
             }
-        end
-        
-        -- Update visibility based on current search
-        updateAnimationButtonsVisibility(animSearchTextBox.Text)
-    end
-
-    -- Create buttons for each animation in the BuiltInAnimationsR15 table
-    for animName, animId in pairs(BuiltInAnimationsR15) do
-        -- Create a container for each animation entry
-        local animContainer = Instance.new("Frame")
-        animContainer.Name = animName .. "Container"
-        animContainer.Size = UDim2.new(1, -10, 0, 60) -- Taller container for modern look
-        animContainer.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-        animContainer.BorderSizePixel = 0
-        local containerCorner = Instance.new("UICorner")
-        containerCorner.CornerRadius = UDim.new(0, 8)
-        containerCorner.Parent = animContainer
-        animContainer.Parent = animScrollFrame
-        
-        -- Add subtle shadow effect
-        local shadow = Instance.new("ImageLabel")
-        shadow.Name = "Shadow"
-        shadow.AnchorPoint = Vector2.new(0.5, 0.5)
-        shadow.BackgroundTransparency = 1
-        shadow.Position = UDim2.new(0.5, 0, 0.5, 2) -- Offset slightly
-        shadow.Size = UDim2.new(1, 6, 1, 6)
-        shadow.ZIndex = 0
-        shadow.Image = "rbxassetid://6014261993" -- Soft shadow image
-        shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-        shadow.ImageTransparency = 0.7
-        shadow.ScaleType = Enum.ScaleType.Slice
-        shadow.SliceCenter = Rect.new(49, 49, 450, 450)
-        shadow.Parent = animContainer
-
-        local animNameButton = Instance.new("TextButton")
-        animNameButton.Name = animName .. "NameButton"
-        animNameButton.Size = UDim2.new(1, -140, 0, 30) -- Wider button for title
-        animNameButton.Position = UDim2.new(0, 10, 0, 5) -- Positioned inside container
-        animNameButton.Text = animName
-        animNameButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        animNameButton.TextSize = 14
-        animNameButton.Font = Enum.Font.GothamSemibold
-        animNameButton.BackgroundColor3 = Color3.fromRGB(60, 60, 70)
-        animNameButton.BorderSizePixel = 0
-        animNameButton.TextXAlignment = Enum.TextXAlignment.Center
-        local buttonCorner = Instance.new("UICorner")
-        buttonCorner.CornerRadius = UDim.new(0, 6)
-        buttonCorner.Parent = animNameButton
-        animNameButton.Parent = animContainer
-
-        -- When clicked, set the animation ID in the textbox of the main GUI
-        animNameButton.MouseButton1Click:Connect(function()
-            animTextBox.Text = tostring(animId)
-        end)
-
-        -- Play Animation Button
-        local playAnimButton = Instance.new("TextButton")
-        playAnimButton.Name = animName .. "PlayButton"
-        playAnimButton.Size = UDim2.new(0.5, -15, 0, 30) -- Half width minus padding
-        playAnimButton.Position = UDim2.new(0, 10, 0, 40) -- Below name button
-        playAnimButton.Text = "Play"
-        playAnimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        playAnimButton.TextSize = 14
-        playAnimButton.Font = Enum.Font.GothamMedium
-        playAnimButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- Purple
-        playAnimButton.BorderSizePixel = 0
-        local playButtonCorner = Instance.new("UICorner")
-        playButtonCorner.CornerRadius = UDim.new(0, 6)
-        playButtonCorner.Parent = playAnimButton
-        playAnimButton.Parent = animContainer
-
-        playAnimButton.MouseButton1Click:Connect(function()
-            playFakeAnimation(tostring(animId)) -- Call playFakeAnimation with the ID
-        end)
-
-        -- Stop Animation Button
-        local stopAnimButton = Instance.new("TextButton")
-        stopAnimButton.Name = animName .. "StopButton"
-        stopAnimButton.Size = UDim2.new(0.5, -15, 0, 30) -- Half width minus padding
-        stopAnimButton.Position = UDim2.new(0.5, 5, 0, 40) -- Right of play button
-        stopAnimButton.Text = "Stop"
-        stopAnimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        stopAnimButton.TextSize = 14
-        stopAnimButton.Font = Enum.Font.GothamMedium
-        stopAnimButton.BackgroundColor3 = Color3.fromRGB(211, 47, 47) -- Red
-        stopAnimButton.BorderSizePixel = 0
-        local stopButtonCorner = Instance.new("UICorner")
-        stopButtonCorner.CornerRadius = UDim.new(0, 6)
-        stopButtonCorner.Parent = stopAnimButton
-        stopAnimButton.Parent = animContainer
-
-        stopAnimButton.MouseButton1Click:Connect(function()
-            stopFakeAnimation() -- Call stopFakeAnimation function
-        end)
-
-        -- Favorite Animation Button
-        local favoriteAnimButton = Instance.new("TextButton")
-        favoriteAnimButton.Name = animName .. "FavoriteButton"
-        favoriteAnimButton.Size = UDim2.new(0, 36, 0, 36)
-        favoriteAnimButton.Position = UDim2.new(1, -130, 0, 12) -- Right side of container
-        favoriteAnimButton.Text = favoriteAnimations[animName] and "★" or "☆" -- Filled star if favorite, otherwise empty
-        favoriteAnimButton.TextColor3 = Color3.fromRGB(255, 215, 0) -- Gold color
-        favoriteAnimButton.TextSize = 24
-        favoriteAnimButton.Font = Enum.Font.GothamBold
-        favoriteAnimButton.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
-        favoriteAnimButton.BorderSizePixel = 0
-        local favoriteButtonCorner = Instance.new("UICorner")
-        favoriteButtonCorner.CornerRadius = UDim.new(1, 0) -- Circle
-        favoriteButtonCorner.Parent = favoriteAnimButton
-        favoriteAnimButton.Parent = animContainer
-
-        favoriteAnimButton.MouseButton1Click:Connect(function()
-            if favoriteAnimations[animName] then
-                favoriteAnimations[animName] = nil -- Remove from favorites
-            else
-                favoriteAnimations[animName] = true -- Add to favorites
-            end
-            favoriteAnimButton.Text = favoriteAnimations[animName] and "★" or "☆" -- Update button text
-            updateAnimationButtonsVisibility(animSearchTextBox.Text) -- Refresh list to re-sort
-            saveFavorites() -- Save favorites after change
-        end)
-
-        -- NEW: Keybind Animation Button
-        local keybindAnimButton = Instance.new("TextButton")
-        keybindAnimButton.Name = animName .. "KeybindButton"
-        keybindAnimButton.Size = UDim2.new(0, 36, 0, 36)
-        keybindAnimButton.Position = UDim2.new(1, -80, 0, 12) -- Right of favorite button
-        keybindAnimButton.Text = "Key" -- Initial text
-        keybindAnimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        keybindAnimButton.TextSize = 12
-        keybindAnimButton.Font = Enum.Font.GothamMedium
-        keybindAnimButton.BackgroundColor3 = Color3.fromRGB(70, 70, 80)
-        keybindAnimButton.BorderSizePixel = 0
-        local keybindButtonCorner = Instance.new("UICorner")
-        keybindButtonCorner.CornerRadius = UDim.new(1, 0) -- Circle
-        keybindButtonCorner.Parent = keybindAnimButton
-        keybindAnimButton.Parent = animContainer
-
-        keybindAnimButton.MouseButton1Click:Connect(function()
-            if keybindInputActive then return end -- Prevent overlapping keybind inputs
-            keybindInputActive = true
-            currentAnimationForKeybind = animName
-            keybindAnimButton.Text = "..." -- Prompt user to press a key
-            keybindAnimButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- Highlight with purple
-
-            local function inputBeganHandler(input, gameProcessedEvent)
-                if not keybindInputActive or currentAnimationForKeybind ~= animName then return end
-                if input.UserInputType == Enum.UserInputType.Keyboard then
-                    animationKeybinds[animName] = input.KeyCode
-                    saveKeybinds()
-                    updateKeybindButtonText(animationButtons[animName], animName)
-                    keybindInputActive = false
-                    currentAnimationForKeybind = nil
-                    keybindAnimButton.BackgroundColor3 = Color3.fromRGB(70, 70, 80) -- Reset color
-                    UserInputService.InputBegan:Disconnect(inputBeganHandler) -- Disconnect after setting keybind
-                elseif input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                    -- Allow canceling keybind setting by clicking away
-                    updateKeybindButtonText(animationButtons[animName], animName) -- Revert text
-                    keybindInputActive = false
-                    currentAnimationForKeybind = nil
-                    keybindAnimButton.BackgroundColor3 = Color3.fromRGB(70, 70, 80) -- Reset color
-                    UserInputService.InputBegan:Disconnect(inputBeganHandler)
-                end
-            end
-
-            UserInputService.InputBegan:Connect(inputBeganHandler)
-        end)
-
-        -- Add a delete button for custom animations
-        if customAnimations[animName] then
-            local deleteAnimButton = Instance.new("TextButton")
-            deleteAnimButton.Name = animName .. "DeleteButton"
-            deleteAnimButton.Size = UDim2.new(0, 36, 0, 36)
-            deleteAnimButton.Position = UDim2.new(1, -40, 0, 12) -- Right of keybind button
-            deleteAnimButton.Text = "×" -- X symbol
-            deleteAnimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-            deleteAnimButton.TextSize = 24
-            deleteAnimButton.Font = Enum.Font.GothamBold
-            deleteAnimButton.BackgroundColor3 = Color3.fromRGB(211, 47, 47) -- Red
-            deleteAnimButton.BorderSizePixel = 0
-            local deleteButtonCorner = Instance.new("UICorner")
-            deleteButtonCorner.CornerRadius = UDim.new(1, 0) -- Circle
-            deleteButtonCorner.Parent = deleteAnimButton
-            deleteAnimButton.Parent = animContainer
             
-            deleteAnimButton.MouseButton1Click:Connect(function()
-                -- Remove from custom animations
-                customAnimations[animName] = nil
-                -- Remove from built-in animations
-                BuiltInAnimationsR15[animName] = nil
-                -- Save changes
-                saveCustomAnimations()
-                -- Refresh the list
-                refreshAnimationList()
-                updateAnimationButtonsVisibility(animSearchTextBox.Text)
-            end)
+            yOffset = yOffset + 45
         end
-
-        animationButtons[animName] = {
-            Container = animContainer,
-            NameButton = animNameButton,
-            PlayButton = playAnimButton,
-            StopButton = stopAnimButton,
-            FavoriteButton = favoriteAnimButton,
-            KeybindButton = keybindAnimButton
-        }
+        
+        animListContainer.CanvasSize = UDim2.new(0, 0, 0, math.max(0, yOffset))
     end
-
-    -- Initially update button visibility to show all animations
-    updateAnimationButtonsVisibility("")
-
-    -- Update button visibility when search text changes
-    animSearchTextBox:GetPropertyChangedSignal("Text"):Connect(function()
-        updateAnimationButtonsVisibility(animSearchTextBox.Text)
+    
+    -- Initialize the animation list
+    refreshAnimationList()
+    
+    -- Search box functionality
+    searchBox:GetPropertyChangedSignal("Text"):Connect(function()
+        updateAnimationButtonsVisibility(searchBox.Text)
     end)
-
-    -- Button click handlers for the Add Animation popup
-    addAnimButton.MouseButton1Click:Connect(function()
+    
+    -- Speed slider functionality
+    local isDraggingSpeed = false
+    
+    local function updateSpeedFromPosition(input)
+        local sliderPosition = (input.Position.X - sliderBG.AbsolutePosition.X) / sliderBG.AbsoluteSize.X
+        sliderPosition = math.clamp(sliderPosition, 0, 1)
+        local newSpeed = 0.5 + sliderPosition * 3.5 -- Range from 0.5 to 4.0
+        
+        -- Update slider visuals
+        sliderFill.Size = UDim2.new(sliderPosition, 0, 1, 0)
+        
+        -- Update speed value
+        local displaySpeed = math.floor(newSpeed * 100)
+        speedValue.Text = tostring(displaySpeed)
+        
+        -- Update animation speed
+        fakeAnimSpeed = newSpeed
+    end
+    
+    sliderBG.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            isDraggingSpeed = true
+            updateSpeedFromPosition(input)
+        end
+    end)
+    
+    sliderBG.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            isDraggingSpeed = false
+        end
+    end)
+    
+    sliderBG.InputChanged:Connect(function(input)
+        if isDraggingSpeed and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            updateSpeedFromPosition(input)
+        end
+    end)
+    
+    -- Initialize speed slider to 100%
+    sliderFill.Size = UDim2.new(0.143, 0, 1, 0) -- ~14.3% position = 100% speed (0.5 + 0.143*3.5 = ~1.0)
+    speedValue.Text = "100"
+    fakeAnimSpeed = 1.0
+    
+    -- Add button functionality
+    addButton.MouseButton1Click:Connect(function()
         nameInput.Text = ""
         idInput.Text = ""
         addAnimPopup.Visible = true
     end)
     
-    saveButton.MouseButton1Click:Connect(function()
+    -- Cancel button functionality
+    cancelButton.MouseButton1Click:Connect(function()
+        addAnimPopup.Visible = false
+    end)
+    
+    -- Popup add button functionality
+    popupAddButton.MouseButton1Click:Connect(function()
         local animName = nameInput.Text:gsub("^%s*(.-)%s*$", "%1") -- Trim whitespace
         local animId = idInput.Text:gsub("^%s*(.-)%s*$", "%1") -- Trim whitespace
         
         -- Validate inputs
-        if animName == "" then
-            -- Flash the name input red to indicate error
-            local originalColor = nameInput.BackgroundColor3
-            nameInput.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
-            task.delay(0.3, function()
-                nameInput.BackgroundColor3 = originalColor
-            end)
-            return
-        end
-        
-        if animId == "" or not tonumber(animId) then
-            -- Flash the ID input red to indicate error
-            local originalColor = idInput.BackgroundColor3
-            idInput.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
-            task.delay(0.3, function()
-                idInput.BackgroundColor3 = originalColor
-            end)
+        if animName == "" or animId == "" then
             return
         end
         
@@ -1502,616 +1311,42 @@ local function createAnimationListGui(animTextBox)
         
         -- Refresh the animation list
         refreshAnimationList()
+        updateAnimationButtonsVisibility(searchBox.Text)
     end)
     
-    cancelButton.MouseButton1Click:Connect(function()
-        addAnimPopup.Visible = false
-    end)
-
-    -- Drag functionality for the Animation List GUI
-    local dragging = false
-    local dragInput, dragStart, startPos
-    local function updateInput(input)
-        local delta = input.Position - dragStart
-        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-
-    titleBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = mainFrame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-
-    titleBar.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            dragInput = input
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and (input == dragInput) then
-            updateInput(input)
-        end
-    end)
-
-    return screenGui
-end
-
-local animationListGui = nil -- Variable to track if animation list is open
-
--- Creates a modern, sleek draggable GUI
-local function createDraggableGui(getGhostEnabled, toggleGhost, getSizeValue, setSizeValue, getWidthValue, setWidthValue)
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "PoisonHubGui"
-    screenGui.ResetOnSpawn = false
-    screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
-    local mainFrame = Instance.new("Frame")
-    mainFrame.Name = "MainFrame"
-    mainFrame.Size = UDim2.new(0, 360, 0, 480)  -- Slightly larger for modern look
-    mainFrame.Position = UDim2.new(0.5, -180, 0.5, -240)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30) -- Darker background
-    mainFrame.BorderSizePixel = 0
-    local uiCorner = Instance.new("UICorner")
-    uiCorner.CornerRadius = UDim.new(0, 12)
-    uiCorner.Parent = mainFrame
-    
-    -- Add a subtle gradient to the main frame
-    local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(25, 25, 30)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 35, 40))
-    })
-    gradient.Rotation = 45
-    gradient.Parent = mainFrame
-    
-    mainFrame.Parent = screenGui
-
-    -- Add a subtle shadow effect
-    local shadow = Instance.new("ImageLabel")
-    shadow.Name = "Shadow"
-    shadow.AnchorPoint = Vector2.new(0.5, 0.5)
-    shadow.BackgroundTransparency = 1
-    shadow.Position = UDim2.new(0.5, 0, 0.5, 4) -- Offset slightly
-    shadow.Size = UDim2.new(1, 12, 1, 12)
-    shadow.ZIndex = 0
-    shadow.Image = "rbxassetid://6014261993" -- Soft shadow image
-    shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-    shadow.ImageTransparency = 0.6
-    shadow.ScaleType = Enum.ScaleType.Slice
-    shadow.SliceCenter = Rect.new(49, 49, 450, 450)
-    shadow.Parent = mainFrame
-
-    local titleBar = Instance.new("Frame")
-    titleBar.Name = "TitleBar"
-    titleBar.Size = UDim2.new(1, 0, 0, 50) -- Taller title bar
-    titleBar.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- Purple color for Poison Hub
-    titleBar.BorderSizePixel = 0
-    local titleCorner = Instance.new("UICorner")
-    titleCorner.CornerRadius = UDim.new(0, 12)
-    titleCorner.Parent = titleBar
-    
-    -- Add a subtle gradient to the title bar
-    local titleGradient = Instance.new("UIGradient")
-    titleGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(138, 43, 226)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(158, 63, 246))
-    })
-    titleGradient.Rotation = 45
-    titleGradient.Parent = titleBar
-    
-    titleBar.Parent = mainFrame
-
-    -- Create a bottom edge for the title bar to fix corner clipping
-    local titleBarBottom = Instance.new("Frame")
-    titleBarBottom.Name = "BottomEdge"
-    titleBarBottom.Size = UDim2.new(1, 0, 0, 12)
-    titleBarBottom.Position = UDim2.new(0, 0, 1, -12)
-    titleBarBottom.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
-    titleBarBottom.BorderSizePixel = 0
-    titleBarBottom.ZIndex = 0
-    titleGradient:Clone().Parent = titleBarBottom
-    titleBarBottom.Parent = titleBar
-
-    -- Modern logo
-    local logoContainer = Instance.new("Frame")
-    logoContainer.Name = "LogoContainer"
-    logoContainer.Size = UDim2.new(0, 36, 0, 36)
-    logoContainer.Position = UDim2.new(0, 12, 0, 7)
-    logoContainer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    logoContainer.BackgroundTransparency = 0.9
-    local logoCorner = Instance.new("UICorner")
-    logoCorner.CornerRadius = UDim.new(1, 0) -- Circle
-    logoCorner.Parent = logoContainer
-    logoContainer.Parent = titleBar
-
-    local logo = Instance.new("ImageLabel")
-    logo.Name = "Logo"
-    logo.Size = UDim2.new(0, 24, 0, 24)
-    logo.Position = UDim2.new(0.5, -12, 0.5, -12)
-    logo.BackgroundTransparency = 1
-    logo.Image = "rbxassetid://6022668885" -- You can replace with a custom logo
-    logo.Parent = logoContainer
-
-    local titleLabel = Instance.new("TextLabel")
-    titleLabel.Name = "Title"
-    titleLabel.Size = UDim2.new(1, -120, 0, 30)
-    titleLabel.Position = UDim2.new(0, 60, 0, 5)
-    titleLabel.Text = "Poison Hub"
-    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    titleLabel.TextSize = 22
-    titleLabel.Font = Enum.Font.GothamBold
-    titleLabel.BackgroundTransparency = 1
-    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    titleLabel.Parent = titleBar
-
-    -- Credit Label
-    local creditLabel = Instance.new("TextLabel")
-    creditLabel.Name = "CreditLabel"
-    creditLabel.Size = UDim2.new(1, -120, 0, 20)
-    creditLabel.Position = UDim2.new(0, 60, 0, 30)
-    creditLabel.Text = "Reanimation script by AK ADMIN"
-    creditLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
-    creditLabel.TextSize = 12
-    creditLabel.Font = Enum.Font.Gotham
-    creditLabel.BackgroundTransparency = 1
-    creditLabel.TextXAlignment = Enum.TextXAlignment.Left
-    creditLabel.Parent = titleBar
-
-    -- Minimize Button
-    local minimizeButton = Instance.new("TextButton")
-    minimizeButton.Name = "MinimizeButton"
-    minimizeButton.Size = UDim2.new(0, 36, 0, 36)
-    minimizeButton.Position = UDim2.new(1, -80, 0, 7)
-    minimizeButton.Text = "−" -- Minus symbol
-    minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    minimizeButton.TextSize = 24
-    minimizeButton.Font = Enum.Font.GothamBold
-    minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    minimizeButton.BackgroundTransparency = 0.9
-    minimizeButton.AutoButtonColor = true
-    local minimizeCorner = Instance.new("UICorner")
-    minimizeCorner.CornerRadius = UDim.new(1, 0) -- Circle
-    minimizeCorner.Parent = minimizeButton
-    minimizeButton.Parent = titleBar
-
-    -- Close Button
-    local closeButton = Instance.new("TextButton")
-    closeButton.Name = "CloseButton"
-    closeButton.Size = UDim2.new(0, 36, 0, 36)
-    closeButton.Position = UDim2.new(1, -44, 0, 7)
-    closeButton.Text = "×" -- Multiplication symbol for a cleaner look
-    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    closeButton.TextSize = 24
-    closeButton.Font = Enum.Font.GothamBold
-    closeButton.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
-    closeButton.BackgroundTransparency = 0.3
-    closeButton.AutoButtonColor = true
-    local closeCorner = Instance.new("UICorner")
-    closeCorner.CornerRadius = UDim.new(1, 0) -- Circle
-    closeCorner.Parent = closeButton
-    closeButton.Parent = titleBar
-
-    -- Content Frame
-    local contentFrame = Instance.new("Frame")
-    contentFrame.Name = "Content"
-    contentFrame.Size = UDim2.new(1, -40, 1, -70)
-    contentFrame.Position = UDim2.new(0, 20, 0, 60)
-    contentFrame.BackgroundTransparency = 1
-    contentFrame.Parent = mainFrame
-
-    -- Modern toggle button with animation
-    local toggleContainer = Instance.new("Frame")
-    toggleContainer.Name = "ToggleContainer"
-    toggleContainer.Size = UDim2.new(1, 0, 0, 50)
-    toggleContainer.Position = UDim2.new(0, 0, 0, 0)
-    toggleContainer.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-    toggleContainer.BorderSizePixel = 0
-    local toggleContainerCorner = Instance.new("UICorner")
-    toggleContainerCorner.CornerRadius = UDim.new(0, 10)
-    toggleContainerCorner.Parent = toggleContainer
-    toggleContainer.Parent = contentFrame
-
-    local toggleButton = Instance.new("TextButton")
-    toggleButton.Name = "ToggleButton"
-    toggleButton.Size = UDim2.new(1, -20, 1, -20)
-    toggleButton.Position = UDim2.new(0, 10, 0, 10)
-    toggleButton.Text = "Enable Reanimation"
-    toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    toggleButton.TextSize = 16
-    toggleButton.Font = Enum.Font.GothamSemibold
-    toggleButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- Purple color for Poison Hub
-    toggleButton.BorderSizePixel = 0
-    toggleButton.AutoButtonColor = true
-    local toggleCorner = Instance.new("UICorner")
-    toggleCorner.CornerRadius = UDim.new(0, 8)
-    toggleCorner.Parent = toggleButton
-    toggleButton.Parent = toggleContainer
-
-    -- Add a subtle shadow to the toggle button
-    local toggleShadow = Instance.new("ImageLabel")
-    toggleShadow.Name = "Shadow"
-    toggleShadow.AnchorPoint = Vector2.new(0.5, 0.5)
-    toggleShadow.BackgroundTransparency = 1
-    toggleShadow.Position = UDim2.new(0.5, 0, 0.5, 2)
-    toggleShadow.Size = UDim2.new(1, 6, 1, 6)
-    toggleShadow.ZIndex = 0
-    toggleShadow.Image = "rbxassetid://6014261993"
-    toggleShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-    toggleShadow.ImageTransparency = 0.7
-    toggleShadow.ScaleType = Enum.ScaleType.Slice
-    toggleShadow.SliceCenter = Rect.new(49, 49, 450, 450)
-    toggleShadow.Parent = toggleButton
-
-    -- Size Slider Section with modern styling
-    local sizeSection = Instance.new("Frame")
-    sizeSection.Name = "SizeSection"
-    sizeSection.Size = UDim2.new(1, 0, 0, 60)
-    sizeSection.Position = UDim2.new(0, 0, 0, 60)
-    sizeSection.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-    sizeSection.BorderSizePixel = 0
-    local sizeSectionCorner = Instance.new("UICorner")
-    sizeSectionCorner.CornerRadius = UDim.new(0, 10)
-    sizeSectionCorner.Parent = sizeSection
-    sizeSection.Parent = contentFrame
-
-    local sizeLabel = Instance.new("TextLabel")
-    sizeLabel.Name = "SizeLabel"
-    sizeLabel.Size = UDim2.new(1, -20, 0, 24)
-    sizeLabel.Position = UDim2.new(0, 15, 0, 8)
-    sizeLabel.Text = "Clone Size: 100%"
-    sizeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    sizeLabel.TextSize = 14
-    sizeLabel.Font = Enum.Font.GothamSemibold
-    sizeLabel.BackgroundTransparency = 1
-    sizeLabel.TextXAlignment = Enum.TextXAlignment.Left
-    sizeLabel.Parent = sizeSection
-
-    local sizeSliderBG = Instance.new("Frame")
-    sizeSliderBG.Name = "SliderBG"
-    sizeSliderBG.Size = UDim2.new(1, -30, 0, 8)
-    sizeSliderBG.Position = UDim2.new(0, 15, 0, 38)
-    sizeSliderBG.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
-    sizeSliderBG.BorderSizePixel = 0
-    local sliderBGCorner = Instance.new("UICorner")
-    sliderBGCorner.CornerRadius = UDim.new(0, 4)
-    sliderBGCorner.Parent = sizeSliderBG
-    sizeSliderBG.Parent = sizeSection
-
-    local sizeSliderFill = Instance.new("Frame")
-    sizeSliderFill.Name = "SliderFill"
-    sizeSliderFill.Size = UDim2.new(0.5, 0, 1, 0)
-    sizeSliderFill.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- Purple color for Poison Hub
-    sizeSliderFill.BorderSizePixel = 0
-    local sliderFillCorner = Instance.new("UICorner")
-    sliderFillCorner.CornerRadius = UDim.new(0, 4)
-    sliderFillCorner.Parent = sizeSliderFill
-    sizeSliderFill.Parent = sizeSliderBG
-
-    -- Add a slider knob
-    local sizeSliderKnob = Instance.new("Frame")
-    sizeSliderKnob.Name = "SliderKnob"
-    sizeSliderKnob.Size = UDim2.new(0, 16, 0, 16)
-    sizeSliderKnob.Position = UDim2.new(0.5, -8, 0.5, -8)
-    sizeSliderKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    sizeSliderKnob.BorderSizePixel = 0
-    local knobCorner = Instance.new("UICorner")
-    knobCorner.CornerRadius = UDim.new(1, 0) -- Circle
-    knobCorner.Parent = sizeSliderKnob
-    
-    -- Add a subtle shadow to the knob
-    local knobShadow = Instance.new("ImageLabel")
-    knobShadow.Name = "Shadow"
-    knobShadow.AnchorPoint = Vector2.new(0.5, 0.5)
-    knobShadow.BackgroundTransparency = 1
-    knobShadow.Position = UDim2.new(0.5, 0, 0.5, 1)
-    knobShadow.Size = UDim2.new(1.2, 0, 1.2, 0)
-    knobShadow.ZIndex = 0
-    knobShadow.Image = "rbxassetid://6014261993"
-    knobShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-    knobShadow.ImageTransparency = 0.7
-    knobShadow.ScaleType = Enum.ScaleType.Slice
-    knobShadow.SliceCenter = Rect.new(49, 49, 450, 450)
-    knobShadow.Parent = sizeSliderKnob
-    
-    sizeSliderKnob.Parent = sizeSliderFill
-
-    local function updateSizeSlider(value)
-        local fillValue = 0
-        if value <= 0.5 then
-            fillValue = 0
-        elseif value >= 20 then
-            fillValue = 1
+    -- Toggle button functionality
+    toggleButton.MouseButton1Click:Connect(function()
+        local newState = not ghostEnabled
+        setGhostEnabled(newState)
+        
+        if newState then
+            toggleButton.Text = "Disable Reanimation"
+            toggleButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50) -- Red for active
         else
-            fillValue = (value - 0.5) / 19.5
-        end
-        sizeSliderFill.Size = UDim2.new(fillValue, 0, 1, 0)
-        sizeLabel.Text = "Clone Size: " .. math.floor(value * 100) .. "%"
-        setSizeValue(value)
-    end
-
-    updateSizeSlider(getSizeValue())
-
-    local isDraggingSize = false
-    local function updateSizeFromPosition(input)
-        local sliderPosition = (input.Position.X - sizeSliderBG.AbsolutePosition.X) / sizeSliderBG.AbsoluteSize.X
-        sliderPosition = math.clamp(sliderPosition, 0, 1)
-        local newValue = 0.5 + sliderPosition * 19.5
-        updateSizeSlider(newValue)
-    end
-
-    sizeSliderBG.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            isDraggingSize = true
-            updateSizeFromPosition(input)
+            toggleButton.Text = "Enable Reanimation"
+            toggleButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255) -- Blue for inactive
+            
+            -- Reset all play buttons to "Play"
+            for _, buttonData in pairs(animationButtons) do
+                buttonData.PlayButton.Text = "Play"
+            end
         end
     end)
-    sizeSliderBG.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            isDraggingSize = false
-        end
-    end)
-    sizeSliderBG.InputChanged:Connect(function(input)
-        if isDraggingSize and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            updateSizeFromPosition(input)
-        end
-    end)
-
-    -- Width Slider Section with modern styling
-    local widthSection = Instance.new("Frame")
-    widthSection.Name = "WidthSection"
-    widthSection.Size = UDim2.new(1, 0, 0, 60)
-    widthSection.Position = UDim2.new(0, 0, 0, 130)
-    widthSection.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-    widthSection.BorderSizePixel = 0
-    local widthSectionCorner = Instance.new("UICorner")
-    widthSectionCorner.CornerRadius = UDim.new(0, 10)
-    widthSectionCorner.Parent = widthSection
-    widthSection.Parent = contentFrame
-
-    local widthLabel = Instance.new("TextLabel")
-    widthLabel.Name = "WidthLabel"
-    widthLabel.Size = UDim2.new(1, -20, 0, 24)
-    widthLabel.Position = UDim2.new(0, 15, 0, 8)
-    widthLabel.Text = "Clone Width: 100%"
-    widthLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    widthLabel.TextSize = 14
-    widthLabel.Font = Enum.Font.GothamSemibold
-    widthLabel.BackgroundTransparency = 1
-    widthLabel.TextXAlignment = Enum.TextXAlignment.Left
-    widthLabel.Parent = widthSection
-
-    local widthSliderBG = Instance.new("Frame")
-    widthSliderBG.Name = "WidthSliderBG"
-    widthSliderBG.Size = UDim2.new(1, -30, 0, 8)
-    widthSliderBG.Position = UDim2.new(0, 15, 0, 38)
-    widthSliderBG.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
-    widthSliderBG.BorderSizePixel = 0
-    local widthSliderBGCorner = Instance.new("UICorner")
-    widthSliderBGCorner.CornerRadius = UDim.new(0, 4)
-    widthSliderBGCorner.Parent = widthSliderBG
-    widthSliderBG.Parent = widthSection
-
-    local widthSliderFill = Instance.new("Frame")
-    widthSliderFill.Name = "SliderFill"
-    widthSliderFill.Size = UDim2.new(0.5, 0, 1, 0)
-    widthSliderFill.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- Purple color for Poison Hub
-    widthSliderFill.BorderSizePixel = 0
-    local widthSliderFillCorner = Instance.new("UICorner")
-    widthSliderFillCorner.CornerRadius = UDim.new(0, 4)
-    widthSliderFillCorner.Parent = widthSliderFill
-    widthSliderFill.Parent = widthSliderBG
-
-    -- Add a slider knob
-    local widthSliderKnob = Instance.new("Frame")
-    widthSliderKnob.Name = "SliderKnob"
-    widthSliderKnob.Size = UDim2.new(0, 16, 0, 16)
-    widthSliderKnob.Position = UDim2.new(0.5, -8, 0.5, -8)
-    widthSliderKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    widthSliderKnob.BorderSizePixel = 0
-    local widthKnobCorner = Instance.new("UICorner")
-    widthKnobCorner.CornerRadius = UDim.new(1, 0) -- Circle
-    widthKnobCorner.Parent = widthSliderKnob
     
-    -- Add a subtle shadow to the knob
-    local widthKnobShadow = knobShadow:Clone()
-    widthKnobShadow.Parent = widthSliderKnob
-    
-    widthSliderKnob.Parent = widthSliderFill
-
-    local function updateWidthSlider(value)
-        local fillValue = 0
-        if value <= 0.5 then
-            fillValue = 0
-        elseif value >= 20 then
-            fillValue = 1
-        else
-            fillValue = (value - 0.5) / 19.5
-        end
-        widthSliderFill.Size = UDim2.new(fillValue, 0, 1, 0)
-        widthLabel.Text = "Clone Width: " .. math.floor(value * 100) .. "%"
-        setWidthValue(value)
-    end
-
-    updateWidthSlider(getWidthValue())
-
-    local isDraggingWidth = false
-    local function updateWidthFromPosition(input)
-        local sliderPosition = (input.Position.X - widthSliderBG.AbsolutePosition.X) / widthSliderBG.AbsoluteSize.X
-        sliderPosition = math.clamp(sliderPosition, 0, 1)
-        local newValue = 0.5 + sliderPosition * 19.5
-        updateWidthSlider(newValue)
-    end
-
-    widthSliderBG.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            isDraggingWidth = true
-            updateWidthFromPosition(input)
-        end
-    end)
-    widthSliderBG.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            isDraggingWidth = false
-        end
-    end)
-    widthSliderBG.InputChanged:Connect(function(input)
-        if isDraggingWidth and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            updateWidthFromPosition(input)
-        end
-    end)
-
-    -- Animation Speed Slider Section with modern styling
-    local speedSection = Instance.new("Frame")
-    speedSection.Name = "SpeedSection"
-    speedSection.Size = UDim2.new(1, 0, 0, 60)
-    speedSection.Position = UDim2.new(0, 0, 0, 200)
-    speedSection.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-    speedSection.BorderSizePixel = 0
-    local speedSectionCorner = Instance.new("UICorner")
-    speedSectionCorner.CornerRadius = UDim.new(0, 10)
-    speedSectionCorner.Parent = speedSection
-    speedSection.Parent = contentFrame
-
-    local speedLabel = Instance.new("TextLabel")
-    speedLabel.Name = "SpeedLabel"
-    speedLabel.Size = UDim2.new(1, -20, 0, 24)
-    speedLabel.Position = UDim2.new(0, 15, 0, 8)
-    speedLabel.Text = "Animation Speed: 100%"
-    speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    speedLabel.TextSize = 14
-    speedLabel.Font = Enum.Font.GothamSemibold
-    speedLabel.BackgroundTransparency = 1
-    speedLabel.TextXAlignment = Enum.TextXAlignment.Left
-    speedLabel.Parent = speedSection
-
-    local speedSliderBG = Instance.new("Frame")
-    speedSliderBG.Name = "SpeedSliderBG"
-    speedSliderBG.Size = UDim2.new(1, -30, 0, 8)
-    speedSliderBG.Position = UDim2.new(0, 15, 0, 38)
-    speedSliderBG.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
-    speedSliderBG.BorderSizePixel = 0
-    local speedSliderBGCorner = Instance.new("UICorner")
-    speedSliderBGCorner.CornerRadius = UDim.new(0, 4)
-    speedSliderBGCorner.Parent = speedSliderBG
-    speedSliderBG.Parent = speedSection
-
-    local speedSliderFill = Instance.new("Frame")
-    speedSliderFill.Name = "SpeedSliderFill"
-    speedSliderFill.Size = UDim2.new(0.5, 0, 1, 0)
-    speedSliderFill.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- Purple color for Poison Hub
-    speedSliderFill.BorderSizePixel = 0
-    local speedSliderFillCorner = Instance.new("UICorner")
-    speedSliderFillCorner.CornerRadius = UDim.new(0, 4)
-    speedSliderFillCorner.Parent = speedSliderFill
-    speedSliderFill.Parent = speedSliderBG
-
-    -- Add a slider knob
-    local speedSliderKnob = Instance.new("Frame")
-    speedSliderKnob.Name = "SliderKnob"
-    speedSliderKnob.Size = UDim2.new(0, 16, 0, 16)
-    speedSliderKnob.Position = UDim2.new(0.5, -8, 0.5, -8)
-    speedSliderKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    speedSliderKnob.BorderSizePixel = 0
-    local speedKnobCorner = Instance.new("UICorner")
-    speedKnobCorner.CornerRadius = UDim.new(1, 0) -- Circle
-    speedKnobCorner.Parent = speedSliderKnob
-    
-    -- Add a subtle shadow to the knob
-    local speedKnobShadow = knobShadow:Clone()
-    speedKnobShadow.Parent = speedSliderKnob
-    
-    speedSliderKnob.Parent = speedSliderFill
-
-    local function updateSpeedSlider(value)
-        local fillValue = 0
-        if value <= 0 then -- Min speed 0%
-            fillValue = 0
-        elseif value >= 3.6 then -- Max speed 360%
-            fillValue = 1
-        else
-            fillValue = (value) / (3.6)
-        end
-        speedSliderFill.Size = UDim2.new(fillValue, 0, 1, 0)
-        speedLabel.Text = "Animation Speed: " .. math.floor(value * 100) .. "%"
-        fakeAnimSpeed = value -- Update global animation speed variable, 100% on slider is original speed
-    end
-
-    updateSpeedSlider(1.7) -- Initialize slider to 170% which will be original speed
-
-    local isDraggingSpeed = false
-    local function updateSpeedFromPosition(input)
-        local sliderPosition = (input.Position.X - speedSliderBG.AbsolutePosition.X) / speedSliderBG.AbsoluteSize.X
-        sliderPosition = math.clamp(sliderPosition, 0, 1)
-        local newValue = sliderPosition * 3.6 -- Slider range 0 to 3.6 (0% to 360%)
-        updateSpeedSlider(newValue)
-    end
-
-    speedSliderBG.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            isDraggingSpeed = true
-            updateSpeedFromPosition(input)
-        end
-    end)
-    speedSliderBG.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            isDraggingSpeed = false
-        end
-    end)
-    speedSliderBG.InputChanged:Connect(function(input)
-        if isDraggingSpeed and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            updateSpeedFromPosition(input)
-        end
-    end)
-
+    -- Close button functionality
     closeButton.MouseButton1Click:Connect(function()
         screenGui:Destroy()
     end)
-
-    -- Minimize Logic ---
-    local originalGuiHeight = mainFrame.Size.Y.Offset -- Store initial height
-    local minimizedGuiHeight = titleBar.Size.Y.Offset + 10 -- Height when minimized
-    local minimized = false -- Track minimized state
-
-    minimizeButton.MouseButton1Click:Connect(function() -- Minimize button functionality
-        minimized = not minimized
-        if minimized then
-            contentFrame.Visible = false -- Hide content
-            mainFrame.Size = UDim2.new(0, mainFrame.Size.X.Offset, 0, minimizedGuiHeight) -- Resize to minimized height
-        else
-            contentFrame.Visible = true -- Show content
-            mainFrame.Size = UDim2.new(0, mainFrame.Size.X.Offset, 0, originalGuiHeight) -- Restore original height
-        end
-    end)
-    -- End Minimize Logic ---
-
-    toggleButton.MouseButton1Click:Connect(function()
-        local newState = not getGhostEnabled()
-        toggleGhost(newState)
-        if newState then
-            toggleButton.Text = "Disable Reanimation"
-            toggleButton.BackgroundColor3 = Color3.fromRGB(211, 47, 47) -- Red for active
-            updateSizeSlider(getSizeValue())
-            updateWidthSlider(getWidthValue())
-        else
-            toggleButton.Text = "Enable Reanimation"
-            toggleButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- Purple color for Poison Hub
-        end
-    end)
-
+    
+    -- Make the GUI draggable
     local dragging = false
     local dragInput, dragStart, startPos
+    
     local function updateInput(input)
         local delta = input.Position - dragStart
         mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
-
+    
     titleBar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
@@ -2124,185 +1359,26 @@ local function createDraggableGui(getGhostEnabled, toggleGhost, getSizeValue, se
             end)
         end
     end)
-
+    
     titleBar.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             dragInput = input
         end
     end)
-
+    
     UserInputService.InputChanged:Connect(function(input)
         if dragging and (input == dragInput) then
             updateInput(input)
         end
     end)
-
-    -- EXTRA SECTION: Animation Input & Buttons with modern styling
-    local fakeAnimSection = Instance.new("Frame")
-    fakeAnimSection.Name = "FakeAnimSection"
-    fakeAnimSection.Size = UDim2.new(1, 0, 0, 120)
-    fakeAnimSection.Position = UDim2.new(0, 0, 0, 270)
-    fakeAnimSection.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-    fakeAnimSection.BorderSizePixel = 0
-    local fakeAnimSectionCorner = Instance.new("UICorner")
-    fakeAnimSectionCorner.CornerRadius = UDim.new(0, 10)
-    fakeAnimSectionCorner.Parent = fakeAnimSection
-    fakeAnimSection.Parent = contentFrame
-
-    local animLabel = Instance.new("TextLabel")
-    animLabel.Name = "AnimLabel"
-    animLabel.Size = UDim2.new(1, -20, 0, 24)
-    animLabel.Position = UDim2.new(0, 15, 0, 8)
-    animLabel.Text = "Animation ID"
-    animLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    animLabel.TextSize = 14
-    animLabel.Font = Enum.Font.GothamSemibold
-    animLabel.BackgroundTransparency = 1
-    animLabel.TextXAlignment = Enum.TextXAlignment.Left
-    animLabel.Parent = fakeAnimSection
-
-    local fakeAnimTextBox = Instance.new("TextBox")
-    fakeAnimTextBox.Name = "FakeAnimTextBox"
-    fakeAnimTextBox.Text = ""
-    fakeAnimTextBox.Size = UDim2.new(1, -30, 0, 36)
-    fakeAnimTextBox.Position = UDim2.new(0, 15, 0, 32)
-    fakeAnimTextBox.PlaceholderText = "Enter Animation ID"
-    fakeAnimTextBox.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
-    fakeAnimTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    fakeAnimTextBox.PlaceholderColor3 = Color3.fromRGB(180, 180, 180)
-    fakeAnimTextBox.ClearTextOnFocus = false
-    fakeAnimTextBox.Font = Enum.Font.Gotham
-    fakeAnimTextBox.TextSize = 14
-    local fakeAnimTextBoxCorner = Instance.new("UICorner")
-    fakeAnimTextBoxCorner.CornerRadius = UDim.new(0, 8)
-    fakeAnimTextBoxCorner.Parent = fakeAnimTextBox
-    fakeAnimTextBox.Parent = fakeAnimSection
-
-    local buttonContainer = Instance.new("Frame")
-    buttonContainer.Name = "ButtonContainer"
-    buttonContainer.Size = UDim2.new(1, -30, 0, 36)
-    buttonContainer.Position = UDim2.new(0, 15, 0, 74)
-    buttonContainer.BackgroundTransparency = 1
-    buttonContainer.Parent = fakeAnimSection
-
-    local fakeAnimButton = Instance.new("TextButton")
-    fakeAnimButton.Name = "FakeAnimButton"
-    fakeAnimButton.Size = UDim2.new(0.5, -5, 1, 0)
-    fakeAnimButton.Position = UDim2.new(0, 0, 0, 0)
-    fakeAnimButton.Text = "Play Animation"
-    fakeAnimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    fakeAnimButton.TextSize = 14
-    fakeAnimButton.Font = Enum.Font.GothamSemibold
-    fakeAnimButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- Purple
-    fakeAnimButton.BorderSizePixel = 0
-    local fakeAnimButtonCorner = Instance.new("UICorner")
-    fakeAnimButtonCorner.CornerRadius = UDim.new(0, 8)
-    fakeAnimButtonCorner.Parent = fakeAnimButton
-    fakeAnimButton.Parent = buttonContainer
-
-    local stopFakeAnimButton = Instance.new("TextButton")
-    stopFakeAnimButton.Name = "StopFakeAnimButton"
-    stopFakeAnimButton.Size = UDim2.new(0.5, -5, 1, 0)
-    stopFakeAnimButton.Position = UDim2.new(0.5, 5, 0, 0)
-    stopFakeAnimButton.Text = "Stop Animation"
-    stopFakeAnimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    stopFakeAnimButton.TextSize = 14
-    stopFakeAnimButton.Font = Enum.Font.GothamSemibold
-    stopFakeAnimButton.BackgroundColor3 = Color3.fromRGB(211, 47, 47) -- Red
-    stopFakeAnimButton.BorderSizePixel = 0
-    local stopFakeAnimButtonCorner = Instance.new("UICorner")
-    stopFakeAnimButtonCorner.CornerRadius = UDim.new(0, 8)
-    stopFakeAnimButtonCorner.Parent = stopFakeAnimButton
-    stopFakeAnimButton.Parent = buttonContainer
-
-    -- Add button shadows
-    local playButtonShadow = toggleShadow:Clone()
-    playButtonShadow.Parent = fakeAnimButton
     
-    local stopButtonShadow = toggleShadow:Clone()
-    stopButtonShadow.Parent = stopFakeAnimButton
-
-    fakeAnimButton.MouseButton1Click:Connect(function()
-        if ghostClone then
-            local animId = fakeAnimTextBox.Text
-            playFakeAnimation(animId)
-        else
-            warn("No fake character available!")
-        end
-    end)
-
-    stopFakeAnimButton.MouseButton1Click:Connect(function()
-        stopFakeAnimation()
-    end)
-
-    -- Animation List Button Section
-    local animListSection = Instance.new("Frame")
-    animListSection.Name = "AnimListSection"
-    animListSection.Size = UDim2.new(1, 0, 0, 50)
-    animListSection.Position = UDim2.new(0, 0, 1, -50)
-    animListSection.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-    animListSection.BorderSizePixel = 0
-    local animListSectionCorner = Instance.new("UICorner")
-    animListSectionCorner.CornerRadius = UDim.new(0, 10)
-    animListSectionCorner.Parent = animListSection
-    animListSection.Parent = contentFrame
-
-    local animListButton = Instance.new("TextButton")
-    animListButton.Name = "AnimListButton"
-    animListButton.Size = UDim2.new(1, -30, 1, -20)
-    animListButton.Position = UDim2.new(0, 15, 0, 10)
-    animListButton.Text = "Open Animation List"
-    animListButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    animListButton.TextSize = 16
-    animListButton.Font = Enum.Font.GothamSemibold
-    animListButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- Purple color for Poison Hub
-    animListButton.BorderSizePixel = 0
-    animListButton.AutoButtonColor = true
-    local animListCorner = Instance.new("UICorner")
-    animListCorner.CornerRadius = UDim.new(0, 8)
-    animListCorner.Parent = animListButton
-    
-    -- Add button shadow
-    local animListButtonShadow = toggleShadow:Clone()
-    animListButtonShadow.Parent = animListButton
-    
-    animListButton.Parent = animListSection
-
-    animListButton.MouseButton1Click:Connect(function()
-        if animationListGui then
-            animationListGui:Destroy()
-            animationListGui = nil
-            animListButton.Text = "Open Animation List"
-        else
-            animationListGui = createAnimationListGui(fakeAnimTextBox)
-            animListButton.Text = "Close Animation List"
-        end
-    end)
-
     return screenGui
 end
 
-local gui = createDraggableGui(
-    function() return ghostEnabled end,
-    setGhostEnabled,
-    function() return cloneSize end,
-    function(size)
-        cloneSize = size
-        if ghostEnabled and ghostClone then
-            updateCloneScale()
-        end
-    end,
-    function() return cloneWidth end,
-    function(width)
-        cloneWidth = width
-        if ghostEnabled and ghostClone then
-            updateCloneScale()
-        end
-    end
-)
-gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+-- Create the GUI when the script runs
+local phantomHubGui = createPhantomHubGui()
 
--- NEW: Keybind Handling outside GUI with toggle functionality
+-- Keybind handling for animations
 UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
     if gameProcessedEvent then return end -- Don't process if chat or other UI is using input
     if input.UserInputType == Enum.UserInputType.Keyboard then
@@ -2314,7 +1390,9 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
                     stopFakeAnimation()
                 else
                     -- If it's not playing or a different animation is playing, play this one
-                    playFakeAnimation(BuiltInAnimationsR15[animName])
+                    if ghostEnabled then
+                        playFakeAnimation(BuiltInAnimationsR15[animName])
+                    end
                 end
                 return -- Stop checking after finding a match
             end
